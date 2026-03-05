@@ -1,0 +1,3319 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Campus Online Pro — Онлайн-кампус нового поколения</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+<style>
+:root {
+  --background: 0 0% 0%;               /* pure black */
+  --foreground: 210 40% 98%;           /* near-white */
+  --card: 10 10% 8%;                   /* very dark grey */
+  --primary: 262.1 83.3% 57.8%;        /* vibrant purple */
+  --primary-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --radius: 0.75rem;                   /* smaller corners */
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+background: hsl(var(--background));
+color: hsl(var(--foreground));
+line-height: 1.5;
+overflow-x: hidden;
+}
+.container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+header {
+padding: 1.25rem 0;
+border-bottom: 1px solid hsl(var(--border));
+}
+.header-inner {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+.logo {
+font-size: 1.5rem;
+font-weight: 800;
+display: flex;
+align-items: center;
+}
+.logo svg {
+margin-right: 0.5rem;
+width: 2rem;
+height: 2rem;
+}
+nav ul {
+display: flex;
+list-style: none;
+gap: 1.5rem;
+}
+nav a {
+text-decoration: none;
+color: hsl(var(--foreground));
+font-weight: 500;
+transition: color 0.2s;
+}
+nav a:hover, nav a.active {
+color: hsl(var(--primary));
+}
+.auth-buttons {
+display: flex;
+gap: 1rem;
+align-items: center;
+position: relative;
+}
+#user-menu {
+display: flex;
+align-items: center;
+}
+.btn {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 0.5rem 1.25rem;
+font-weight: 500;
+border-radius: var(--radius);
+text-decoration: none;
+transition: all 0.2s ease;
+cursor: pointer;
+font-size: 0.95rem;
+}
+.btn-primary {
+background: hsl(var(--primary));
+color: hsl(var(--primary-foreground));
+}
+.btn-outline {
+background: transparent;
+border: 1px solid hsl(var(--border));
+color: hsl(var(--foreground));
+}
+.btn-success {
+background: hsl(142, 76%, 37%);
+color: white;
+}
+.user-icon {
+width: 40px;
+height: 40px;
+border-radius: 50%;
+background: hsl(var(--primary));
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: bold;
+cursor: pointer;
+}
+.dropdown {
+position: absolute;
+top: 100%;
+right: 0;
+margin-top: 0.5rem;
+background: hsl(var(--card));
+border: 1px solid hsl(var(--border));
+border-radius: var(--radius);
+min-width: 180px;
+z-index: 10;
+display: none;
+}
+.dropdown-item {
+display: block;
+padding: 0.75rem 1.25rem;
+color: hsl(var(--foreground));
+text-decoration: none;
+}
+.dropdown-item:hover {
+background: hsl(var(--muted));
+}
+.page {
+display: none;
+padding: 3rem 0;
+}
+.page.active {
+display: block;
+}
+.hero {
+padding: 6rem 0 4rem;
+position: relative;
+overflow: hidden;
+}
+.section-title {
+font-size: 2.25rem;
+font-weight: 700;
+margin-bottom: 1.5rem;
+}
+.section-subtitle {
+font-size: 1.125rem;
+color: hsl(var(--muted-foreground));
+max-width: 42rem;
+margin-bottom: 3rem;
+}
+.card-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+gap: 1.5rem;
+}
+.card {
+background: hsl(var(--card));
+border-radius: var(--radius);
+overflow: hidden;
+border: 1px solid hsl(var(--border));
+transition: transform 0.3s;
+}
+.card:hover {
+transform: translateY(-5px);
+}
+.card-img {
+height: 160px;
+background: linear-gradient(135deg, hsl(var(--primary)/0.1), hsl(262, 83%, 58%)/0.1);
+display: flex;
+align-items: center;
+justify-content: center;
+color: hsl(var(--primary));
+font-size: 2rem;
+}
+.card-content {
+padding: 1.25rem;
+}
+.card-title {
+font-size: 1.25rem;
+font-weight: 600;
+margin-bottom: 0.5rem;
+}
+.card-text {
+color: hsl(var(--muted-foreground));
+font-size: 0.95rem;
+margin-bottom: 1rem;
+}
+.badge {
+display: inline-block;
+padding: 0.25rem 0.75rem;
+border-radius: 9999px;
+font-size: 0.75rem;
+font-weight: 600;
+margin-right: 0.5rem;
+}
+.badge-blue { background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); }
+.badge-green { background: hsl(142, 76%, 37%)/0.2; color: hsl(142, 76%, 37%); }
+.form-group {
+margin-bottom: 1.25rem;
+}
+.form-label {
+display: block;
+margin-bottom: 0.5rem;
+font-weight: 500;
+}
+.form-input,
+.form-textarea,
+.form-select {
+width: 100%;
+padding: 0.75rem;
+background: hsl(var(--card));
+border: 1px solid hsl(var(--border));
+border-radius: var(--radius);
+color: hsl(var(--foreground));
+font-family: inherit;
+}
+.form-textarea {
+min-height: 120px;
+resize: vertical;
+}
+.stats-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+gap: 1.5rem;
+margin-bottom: 3rem;
+}
+.stat-card {
+background: hsl(var(--card));
+border-radius: var(--radius);
+padding: 1.5rem;
+border: 1px solid hsl(var(--border));
+}
+.stat-value {
+font-size: 2rem;
+font-weight: 700;
+color: hsl(var(--primary));
+margin-bottom: 0.25rem;
+}
+.stat-label {
+color: hsl(var(--muted-foreground));
+font-size: 0.95rem;
+}
+.table-container {
+overflow-x: auto;
+margin: 1.5rem 0;
+}
+table {
+width: 100%;
+border-collapse: collapse;
+background: hsl(var(--card));
+border: 1px solid hsl(var(--border));
+border-radius: var(--radius);
+}
+th, td {
+padding: 0.75rem 1rem;
+text-align: left;
+border-bottom: 1px solid hsl(var(--border));
+}
+th {
+background: hsl(var(--muted));
+font-weight: 600;
+}
+tr:last-child td {
+border-bottom: none;
+}
+.success {
+color: hsl(142, 76%, 37%);
+font-weight: 600;
+}
+.error {
+color: hsl(0, 62.8%, 30.6%);
+font-weight: 600;
+}
+footer {
+background: hsl(var(--card));
+padding: 3rem 0 2rem;
+border-top: 1px solid hsl(var(--border));
+margin-top: 4rem;
+}
+.footer-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+gap: 2rem;
+margin-bottom: 2rem;
+}
+.footer-title {
+font-size: 1.125rem;
+font-weight: 600;
+margin-bottom: 1rem;
+}
+.footer-links {
+list-style: none;
+}
+.footer-links li {
+margin-bottom: 0.5rem;
+}
+.footer-links a {
+color: hsl(var(--muted-foreground));
+text-decoration: none;
+transition: color 0.2s;
+}
+.footer-links a:hover {
+color: hsl(var(--primary));
+}
+.copyright {
+text-align: center;
+padding-top: 2rem;
+border-top: 1px solid hsl(var(--border));
+color: hsl(var(--muted-foreground));
+font-size: 0.9rem;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.animate-in {
+animation: fadeIn 0.6s ease forwards;
+}
+/* Drag-and-drop стили */
+#questions-container .card.dragging {
+opacity: 0.5;
+transform: rotate(2deg);
+}
+#questions-container .card {
+cursor: grab;
+transition: opacity 0.2s, transform 0.2s;
+}
+#questions-container .card:active {
+cursor: grabbing;
+}
+@media (max-width: 768px) {
+.header-inner { flex-direction: column; gap: 1rem; }
+nav ul { flex-wrap: wrap; justify-content: center; }
+.auth-buttons { justify-content: center; }
+}
+.page {
+  display: none;
+}
+.page.active {
+  display: block;
+}
+.category-btn.active {
+    background: hsl(var(--primary));
+    color: white;
+}
+</style>
+</head>
+<body>
+  <div id="loading-spinner" style="display: flex; justify-content: center; align-items: center; height: 100vh; background: hsl(var(--background));">
+  <div style="width: 50px; height: 50px; border: 3px solid hsl(var(--primary)/0.2); border-radius: 50%; border-top-color: hsl(var(--primary)); animation: spin 1s linear infinite;"></div>
+</div>
+
+<style>
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+<header style="padding: 1.25rem 0; border-bottom: 1px solid hsl(var(--border));">
+  <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
+    <!-- Логотип -->
+    <a href="#" class="logo" onclick="showPage('home'); return false;" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.3rem; color: white;">
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: hsl(var(--primary)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">C</div>
+      <span>CampusPro</span>
+    </a>
+
+    <!-- Навигация -->
+    <nav style="display: flex; gap: 1.5rem;">
+      <a href="#" class="active" onclick="showPage('home'); return false;" style="color: hsl(var(--foreground)); font-weight: 500; text-decoration: none;">Главная</a>
+      <a href="#" onclick="showPage('courses'); return false;" style="color: hsl(var(--foreground)); font-weight: 500; text-decoration: none;">Курсы</a>
+      <a href="#" onclick="showPage('contact'); return false;" style="color: hsl(var(--foreground)); font-weight: 500; text-decoration: none;">Контакты</a>
+    </nav>
+
+    <!-- Пользователь -->
+<!-- Пользователь (авторизованный) -->
+<div id="user-menu" style="display: flex; align-items: center; gap: 0.5rem; position: relative;">
+  <div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;" onclick="toggleDropdown()">
+    <div style="width: 32px; height: 32px; border-radius: 50%; background: hsl(var(--primary)); display: flex; align-items: center; justify-content: center;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(215, 20%, 65%);">
+        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z"></path>
+        <path d="M12 14c-2.67 0-8 1.34-8 4v2c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-2c0-2.66-5.33-4-8-4z"></path>
+      </svg>
+    </div>
+    <span id="user-name" style="color: white;">admin</span>
+  </div>
+  <div id="user-dropdown" class="dropdown" style="position: absolute; top: 100%; right: 0; margin-top: 0.5rem; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: var(--radius); min-width: 180px; z-index: 10; display: none;">
+    <a href="#" class="dropdown-item" onclick="showPage('dashboard'); return false;" style="display: block; padding: 0.75rem 1.25rem; color: hsl(var(--foreground)); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(var(--muted-foreground));">
+        <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1-1-1v-7.5Z"/>
+        <path d="M12 12v6"/>
+        <path d="M12 2v6"/>
+      </svg>
+      Перейти в профиль
+    </a>
+      <a href="#" class="dropdown-item" onclick="showEditProfileForm()" style="display: block; padding: 0.75rem 1.25rem; color: hsl(var(--foreground)); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(var(--muted-foreground));">
+      <path d="M12 20h9a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h9z"></path>
+      <path d="M12 13v3"></path>
+      <path d="M12 13h3"></path>
+      <path d="M12 13l4-4"></path>
+    </svg>
+    Редактировать профиль
+  </a>
+    <a href="#" class="dropdown-item" onclick="logout(); return false;" style="display: block; padding: 0.75rem 1.25rem; color: hsl(var(--foreground)); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(var(--muted-foreground));">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+      </svg>
+      Выйти
+    </a>
+  </div>
+</div>
+
+<!-- Кнопки для неавторизованных пользователей -->
+<div id="auth-buttons" style="display: flex; gap: 0.5rem; align-items: center;">
+  <button class="btn btn-outline" style="padding: 0.5rem 1rem; border-radius: 50px; color: hsl(var(--foreground)); border: 1px solid hsl(var(--border)); font-weight: 500; font-size: 0.95rem; height: 36px;" onclick="showPage('login')">
+    Войти
+  </button>
+  <button class="btn btn-primary" style="padding: 0.5rem 1rem; border-radius: 50px; font-weight: 500; font-size: 0.95rem; height: 36px;" onclick="showPage('register')">
+    Регистрация
+  </button>
+</div>
+</header>
+<main>
+
+  
+<!-- Главная -->
+<section id="home" class="page active">
+  <div class="container" style="text-align: center; padding: 6rem 0 4rem;">
+    <!-- Метка -->
+    <div style="display: inline-block; background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.4rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 500;">
+      🌟 Новые курсы доступны уже сейчас
+    </div>
+
+    <!-- Заголовок с градиентом -->
+    <h1 class="section-title" style="font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.25rem; color: white;">
+      Платформа для<br>
+      <span style="background: linear-gradient(90deg, #8a2be2, #ff4081); -webkit-background-clip: text; background-clip: text; color: transparent;">
+        Онлайн обучения
+      </span>
+    </h1>
+
+    <!-- Подзаголовок -->
+    <p class="section-subtitle" style="font-size: 1.25rem; color: hsl(215, 20%, 65%); max-width: 600px; margin: 0 auto 2rem;">
+      Выбери направление и начни обучение уже сегодня
+    </p>
+
+    <!-- Кнопки -->
+    <div style="display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+      <a href="#" onclick="showPage('courses'); return false;" class="btn btn-primary">Начать обучение →</a>
+      <a href="#" onclick="showPage('contact'); return false;" class="btn btn-outline">Связаться со службой поддержки</a>
+    </div>
+  </div>
+<div class="container" style="margin-top: 4rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2 class="section-title" style="font-size: 2.25rem; font-weight: 800; color: white; margin: 0;">
+      Наши курсы
+    </h2>
+    <a href="#" onclick="showPage('courses'); return false;" class="btn btn-outline">Просмотреть Все Курсы →</a>
+  </div>
+   <div class="card-grid" style="gap: 1.5rem;">
+    <!-- Карточка 1 -->
+    <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+      <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">💻</div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: white;">Прогрирование</div>
+      </div>
+      <div style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Новичок</span>
+          <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">12 занятий • 4 недели</span>
+        </div>
+        <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Основы программирования</h3>
+        <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+          Python, алгоритмы, структуры данных. С нуля до первого проекта.
+        </p>
+        <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">12 lessons</div>
+        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem;">Начать курс</button>
+      </div>
+    </div>
+
+    <!-- Карточка 2 -->
+    <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+      <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">🎨</div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: white;">Дизайн</div>
+      </div>
+      <div style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="background: hsl(142, 76%, 37%)/0.2; color: hsl(142, 76%, 37%); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Популярный</span>
+          <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">16 занятий • 6 недель</span>
+        </div>
+        <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Дизайн интерфейсов</h3>
+        <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+          Figma, принципы UX/UI, создание прототипов, дизайн-системы.
+        </p>
+        <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">16 lessons</div>
+        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem;">Начать курс</button>
+      </div>
+    </div>
+
+    <!-- Карточка 3 -->
+    <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+      <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+        <div style="font-size: 1.1rem; font-weight: 600; color: white;">Базы данных</div>
+      </div>
+      <div style="padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span style="background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Продвинутый</span>
+          <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">20 занятий • 8 недель</span>
+        </div>
+        <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Базы данных</h3>
+        <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+          Pandas, машинное обучение, визуализация, реальные кейсы.
+        </p>
+        <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">20 lessons</div>
+        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem;">Начать курс</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Курсы -->
+<section id="courses" class="page">
+  <div class="container">
+    <!-- Заголовок -->
+    <h1 class="section-title" style="font-size: 2.5rem; font-weight: 800; color: white; margin-bottom: 2rem;">Все курсы</h1>
+    
+<!-- Поиск + фильтры -->
+<div style="display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 2.5rem;">
+  <div style="flex: 1; min-width: 300px;">
+  <div style="position: relative;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: hsl(215, 20%, 65%);">
+  <circle cx="11" cy="11" r="8"></circle>
+  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+  </svg>
+  <input type="text" id="search-input" placeholder="Найти курс..." style="
+  width: 100%;
+  padding: 0.75rem 1rem 0.75rem 2.5rem;
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  color: hsl(var(--foreground));
+  font-size: 0.95rem;
+  ">
+  </div>
+  </div>
+  <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+   <button class="btn btn-outline category-btn" data-category="" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; border-radius: 50px; border: 1px solid hsl(var(--border)); color: hsl(var(--foreground));">
+      Все категории
+    </button>
+    <button class="btn btn-outline category-btn" data-category="programming" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; border-radius: 50px; border: 1px solid hsl(var(--border)); color: hsl(var(--foreground));">
+      Программирование
+    </button>
+    <button class="btn btn-outline category-btn" data-category="design" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; border-radius: 50px; border: 1px solid hsl(var(--border)); color: hsl(var(--foreground));">
+      Дизайн
+    </button>
+    <button class="btn btn-outline category-btn" data-category="databases" style="padding: 0.5rem 1.25rem; font-size: 0.9rem; border-radius: 50px; border: 1px solid hsl(var(--border)); color: hsl(var(--foreground));">
+      Базы данных
+    </button>
+  </div>
+  </div>
+    
+    <!-- Карточки курсов (загружаются из базы данных) -->
+    <div class="card-grid" id="dynamic-courses-list">
+      <!-- Курсы будут подгружены сюда -->
+    </div>
+    
+    
+</section>
+
+
+
+<!-- Контакты -->
+<section id="contact" class="page">
+<div class="container">
+<h1 class="section-title">Связаться с нами</h1>
+<p class="section-subtitle">Остались вопросы? Напишите — ответим в течение часа.</p>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; max-width: 800px; margin: 0 auto;">
+<div>
+<h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Контакты</h3>
+<p>📧 <a href="mailto:hello@campus-pro.ru" style="color: hsl(var(--primary));">hello@campus-pro.ru</a></p>
+<p>📞 +7 (495) 123-45-67</p>
+<p>📍 Балаково, ул. Новаторов, д. 10</p>
+<div style="margin-top: 1.5rem;">
+<h4 style="margin-bottom: 0.75rem;">Мы в соцсетях:</h4>
+<div style="display: flex; gap: 1rem;">
+<a href="#" style="display: flex; align-items: center; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--card)); justify-content: center;">💬</a>
+<a href="#" style="display: flex; align-items: center; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--card)); justify-content: center;">.VK</a>
+<a href="#" style="display: flex; align-items: center; width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--card)); justify-content: center;">▶️</a>
+</div>
+</div>
+</div>
+<div>
+<form id="contact-form">
+<div class="form-group">
+<label class="form-label" for="name">Имя</label>
+<input class="form-input" id="name" type="text" placeholder="Анна Петрова">
+</div>
+<div class="form-group">
+<label class="form-label" for="email">Email</label>
+<input class="form-input" id="email" type="email" placeholder="anna@example.com">
+</div>
+<div class="form-group">
+<label class="form-label" for="message">Сообщение</label>
+<textarea class="form-textarea" id="message" placeholder="Расскажите, что вас интересует..."></textarea>
+</div>
+<button type="submit" class="btn btn-primary" style="width: 100%;">Отправить</button>
+</form>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Вход -->
+<section id="login" class="page">
+<div class="container">
+<div style="max-width: 400px; margin: 4rem auto;">
+<h1 class="section-title" style="text-align: center;">Вход</h1>
+<p style="text-align: center; margin-bottom: 2rem; color: hsl(var(--muted-foreground));">Войдите в свой аккаунт</p>
+<form id="login-form">
+<div class="form-group">
+<label class="form-label" for="login-email">Email</label>
+<input class="form-input" id="login-email" type="email" placeholder="anna@example.com" required>
+</div>
+<div class="form-group">
+<label class="form-label" for="login-password">Пароль</label>
+<input class="form-input" id="login-password" type="password" placeholder="••••••••" required>
+</div>
+<div class="form-group">
+<label class="form-label" for="login-role">Роль</label>
+<select class="form-select" id="login-role" required>
+<option value="student">Студент</option>
+<option value="teacher">Преподаватель</option>
+</select>
+</div>
+<button type="submit" class="btn btn-primary" style="width: 100%;">Войти</button>
+<div style="text-align: center; margin-top: 1.5rem;">
+<button type="button" class="btn" style="background: transparent; padding: 0; color: hsl(var(--primary));" onclick="showPage('register'); return false;">
+Нет аккаунта? Регистрация
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+
+
+<!-- Регистрация -->
+<section id="register" class="page">
+<div class="container">
+<div style="max-width: 400px; margin: 4rem auto;">
+<h1 class="section-title" style="text-align: center;">Регистрация</h1>
+<form id="register-form">
+<div class="form-group">
+  <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Имя</label>
+  <input type="text" id="register-name" class="form-input" placeholder="Ваше имя" required style="
+    width: 100%;
+    padding: 0.75rem;
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: 0.75rem;
+    color: hsl(var(--foreground));
+  ">
+</div>
+<div class="form-group">
+<label class="form-label" for="reg-email">Email</label>
+<input class="form-input" id="reg-email" type="email" placeholder="anna@example.com" required>
+</div>
+<div class="form-group">
+<label class="form-label" for="reg-password">Пароль</label>
+<input class="form-input" id="reg-password" type="password" placeholder="••••••••" required>
+</div>
+<div class="form-group">
+<label class="form-label" for="reg-role">Я хочу быть</label>
+<select class="form-select" id="reg-role" required>
+<option value="">Выберите роль</option>
+<option value="student">Студентом</option>
+<option value="teacher">Преподавателем</option>
+</select>
+</div>
+<button type="submit" class="btn btn-primary" style="width: 100%;">Зарегистрироваться</button>
+<div style="text-align: center; margin-top: 1.5rem;">
+<button type="button" class="btn" style="background: transparent; padding: 0; color: hsl(var(--primary));" onclick="showPage('login'); return false;">
+Уже есть аккаунт? Вход
+</button>
+</div>
+</form>
+</div>
+</div>
+</section>
+
+
+<!-- Профиль студента -->
+<section id="dashboard" class="page">
+  <div class="container" style="padding-top: 3rem; padding-bottom: 4rem;">
+    <!-- Приветствие -->
+<div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2.5rem;">
+  <div style="width: 72px; height: 72px; border-radius: 50%; background: hsl(var(--primary)/0.2); display: flex; align-items: center; justify-content: center; font-weight: bold; color: hsl(var(--primary)); font-size: 2.5rem;">
+    <span id="welcome-name-initial">A</span>
+  </div>
+  <div>
+    <h1 style="font-size: 2.25rem; font-weight: 800; color: white; margin: 0;">
+      <span id="welcome-name">С возвращением, admin!</span>
+    </h1>
+    <p style="color: hsl(215, 20%, 65%); font-size: 1.1rem; margin-top: 0.5rem;">
+      <span id="dashboard-subtitle">Управляйте своими курсами и следите за успехами студентов.</span>
+    </p>
+  </div>
+</div>
+
+    <!-- Статистика студента -->
+<div id="student-stats" style="display: none; margin-bottom: 2rem;">
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="total-tests">0</div>
+      <div class="stat-label">Пройдено тестов</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="correct-tests">0</div>
+      <div class="stat-label">Прочитано лекций</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="success-rate">0%</div>
+      <div class="stat-label">Успешность</div>
+    </div>
+  </div>
+  
+  <!-- Активные курсы -->
+  <h2 style="font-size: 1.5rem; margin: 2rem 0 1rem; color: white;">Мои курсы</h2>
+  <div id="no-active-courses" style="display: none; padding: 2rem; text-align: center; color: hsl(215, 20%, 65%);">
+    У вас пока нет активных курсов
+  </div>
+  <div class="card-grid" id="active-student-courses"></div>
+  
+  <!-- Таблица оценок -->
+  <h2 style="font-size: 1.5rem; margin: 2rem 0 1rem; color: white;">История оценок</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Курс</th>
+          <th>Тип</th>
+          <th>Название</th>
+          <th>Оценка</th>
+          <th>Дата</th>
+        </tr>
+      </thead>
+      <tbody id="grades-table">
+        <tr>
+          <td colspan="5" style="text-align: center; padding: 2rem;">Нет оценок</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+  <button class="btn btn-outline" onclick="clearGrades()" style="margin-top: 1rem;">
+    Очистить историю
+  </button>
+</div>
+    
+    <!-- Профиль преподавателя -->
+    <div id="teacher-dashboard" style="display: none;">
+      <div style="margin-bottom: 2rem;">
+      </div>
+      
+      <div style="position: relative;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+          <h2 class="section-title" style="font-size: 1.75rem; font-weight: 700; color: white; margin: 0; display: flex; align-items: center; gap: 0.5rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(var(--primary));">
+              <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1-1-1v-7.5Z"/>
+              <path d="M12 12v6"/>
+              <path d="M12 2v6"/>
+            </svg>
+            Ваши курсы
+          </h2>
+          <button class="btn btn-primary" style="
+            padding: 0.6rem 1.5rem;
+            font-size: 0.95rem;
+            border-radius: 0.75rem;
+            background: hsl(var(--primary));
+            color: white;
+          " onclick="showCreateCourseForm()">
+            Создать новый курс
+          </button>
+        </div>
+        
+        <div class="card-grid" id="teacher-courses-list">
+          <div style="
+            background: hsl(var(--card));
+            border-radius: 1rem;
+            border: 1px solid hsl(var(--border));
+            padding: 3rem 1.5rem;
+            text-align: center;
+            color: hsl(215, 20%, 65%);
+            font-size: 1.1rem;
+          ">
+            У вас пока нет созданных курсов.
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Форма создания курса -->
+    <div id="create-course-form" style="display: none; margin-top: 2rem;">
+      <div style="max-width: 600px; margin: 0 auto;">
+        <h2 class="section-title" style="font-size: 1.75rem; margin-bottom: 1.5rem;">Создать новый курс</h2>
+        <form id="course-form">
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Название курса</label>
+            <input class="form-input" id="course-title" type="text" required placeholder="Например: Введение в Python" style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+            ">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Описание</label>
+            <textarea class="form-textarea" id="course-desc" placeholder="Краткое описание курса..." style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+              min-height: 100px;
+              resize: vertical;
+            "></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Уровень</label>
+            <select class="form-select" id="course-level" required style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+            ">
+              <option value="beginner">Новичок</option>
+              <option value="intermediate">Средний</option>
+              <option value="advanced">Продвинутый</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Категория</label>
+            <select class="form-select" id="course-category" required style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+            ">
+              <option value="programming">Программирование</option>
+              <option value="design">Дизайн</option>
+              <option value="databases">Базы данных</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem;">Создать курс</button>
+          <button type="button" class="btn" style="width: 100%; background: transparent; color: hsl(var(--muted-foreground));" onclick="hideCreateCourseForm()">Отмена</button>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Детали курса -->
+    <div id="course-detail" style="display: none; margin-top: 2rem;">
+      <div style="max-width: 800px; margin: 0 auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 id="detail-course-title" style="font-size: 1.75rem; color: white;"></h2>
+          <button class="btn btn-outline" onclick="editCurrentCourse()">✏️ Редактировать</button>
+        </div>
+        <p id="detail-course-desc" style="color: hsl(215, 20%, 65%); margin-bottom: 1rem;"></p>
+        <p style="color: hsl(215, 20%, 65%);"><strong>Уровень:</strong> <span id="detail-course-level"></span></p>
+        
+        <h3 style="margin: 2rem 0 1rem; color: white;">Лекции</h3>
+        <button class="btn btn-outline" onclick="showAddLectureForm()" style="margin-bottom: 1rem;">+ Добавить лекцию</button>
+        <div id="lecture-list"></div>
+        
+        <h3 style="margin: 2rem 0 1rem; color: white;">Тесты</h3>
+        <button class="btn btn-outline" onclick="showAddTestForm()" style="margin-bottom: 1rem;">+ Создать тест</button>
+        <div id="test-list"></div>
+        
+        <button class="btn" style="margin-top: 2rem; background: transparent; color: hsl(var(--muted-foreground));" onclick="backToCourses()">← Назад к курсам</button>
+      </div>
+    </div>
+    
+    <!-- Форма добавления лекции -->
+    <div id="add-lecture-form" style="display: none; margin-top: 2rem;">
+      <div style="max-width: 600px; margin: 0 auto;">
+        <h2 class="section-title" style="font-size: 1.75rem; margin-bottom: 1.5rem;">Добавить лекцию</h2>
+        <form id="lecture-form">
+          <input type="hidden" id="lecture-course-id">
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Название лекции</label>
+            <input class="form-input" id="lecture-title" type="text" required style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+            ">
+          </div>
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Описание / Конспект</label>
+            <textarea class="form-textarea" id="lecture-content" placeholder="Текст лекции..." style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+              min-height: 150px;
+              resize: vertical;
+            "></textarea>
+          </div>
+  <div class="form-group">
+                <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Файл лекции (PDF, DOCX)</label>
+                <input type="file" id="lecture-file" accept=".pdf,.docx,.doc,.ppt,.pptx" style="
+                    width: 100%;
+                    padding: 0.5rem;
+                    background: hsl(var(--card));
+                    border: 1px solid hsl(var(--border));
+                    border-radius: 0.75rem;
+                    color: hsl(var(--foreground));
+                    ">
+                    <small style="color: hsl(215, 20%, 65%);">Максимум 10 МБ</small>
+            </div>
+            <div id="file-upload-progress" style="display: none; margin-top: 0.5rem;">
+                <div style="background: hsl(var(--border)); border-radius: 0.5rem; height: 4px; overflow: hidden;">
+…                    <div id="progress-bar" style="background: hsl(var(--primary)); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                </div>
+                <span id="progress-text" style="font-size: 0.85rem; color: hsl(215, 20%, 65%);">0%</span>
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem;">Сохранить лекцию</button>
+            <button type="button" class="btn" style="width: 100%; background: transparent; color: hsl(var(--muted-foreground));" onclick="hideAddLectureForm()">Отмена</button>
+        </form>
+    </div>
+</div>
+         
+    
+    <!-- Форма создания теста -->
+    <div id="add-test-form" style="display: none; margin-top: 2rem;">
+      <div style="max-width: 700px; margin: 0 auto;">
+        <h2 class="section-title" style="font-size: 1.75rem; margin-bottom: 1.5rem;">Создать тест</h2>
+        <form id="test-form">
+          <input type="hidden" id="test-course-id">
+          <div class="form-group">
+            <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Название теста</label>
+            <input class="form-input" id="test-title" type="text" required placeholder="Например: Итоговый тест" style="
+              width: 100%;
+              padding: 0.75rem;
+              background: hsl(var(--card));
+              border: 1px solid hsl(var(--border));
+              border-radius: 0.75rem;
+              color: hsl(var(--foreground));
+            ">
+          </div>
+          <h3 style="margin: 1.5rem 0 1rem; color: white;">Вопросы</h3>
+          <div id="questions-container"></div>
+          <button type="button" class="btn btn-outline" onclick="addQuestionField()">+ Добавить вопрос</button>
+          <div style="margin-top: 1.5rem;">
+            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem;">Создать тест</button>
+            <button type="button" class="btn" style="width: 100%; background: transparent; color: hsl(var(--muted-foreground));" onclick="hideAddTestForm()">Отмена</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- Просмотр курса (студент) -->
+<section id="course-view" class="page">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h1 id="view-course-title" class="section-title"></h1>
+      <button class="btn btn-outline" onclick="showPage('courses')">← Назад к курсам</button>
+    </div>
+    <p id="view-course-desc"></p>
+
+    <h2 style="margin: 2rem 0 1rem;">Лекции</h2>
+    <div id="student-lecture-list"></div>
+
+    <h2 style="margin: 2rem 0 1rem;">Тесты</h2>
+    <div id="student-test-list"></div>
+  </div>
+</section>
+
+
+
+<!-- Прохождение теста -->
+<section id="test-view" class="page">
+  <div class="container" style="max-width: 700px; margin: 2rem auto;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h1 id="test-view-title" class="section-title"></h1>
+      <button class="btn btn-outline" onclick="backToCourse()">← Отмена</button>
+    </div>
+    <div id="test-questions-container"></div>
+    <button class="btn btn-primary" style="width: 100%; margin-top: 1.5rem;" onclick="submitTest()">Завершить тест</button>
+    
+    <!-- Контейнер для результата (изначально скрыт) -->
+    <div id="test-result" style="margin-top: 1.5rem; text-align: center; font-size: 1.2rem; display: none;"></div>
+  </div>
+</section>
+
+
+
+<!-- Просмотр лекции (студент) -->
+<section id="lecture-view" class="page">
+  <div class="container">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h1 id="lecture-view-title" class="section-title"></h1>
+      <button class="btn btn-outline" onclick="backToCourse()">← Назад к курсу</button>
+    </div>
+    <div id="lecture-view-content"></div>
+    <div style="margin-top: 2rem;">
+      <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+        <input type="checkbox" id="lecture-completed" onchange="toggleLectureCompleted()">
+        <span>✅ Прочитано</span>
+      </label>
+    </div>
+  </div>
+</section>
+
+
+<!-- Форма редактирования профиля -->
+<div id="edit-profile-form" style="display: none; margin-top: 2rem;">
+  <div style="max-width: 600px; margin: 0 auto;">
+    <h2 class="section-title" style="font-size: 1.75rem; margin-bottom: 1.5rem;">Редактировать профиль</h2>
+    <form id="profile-form">
+      <div class="form-group">
+        <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Имя</label>
+        <input class="form-input" id="profile-name" type="text" required style="
+          width: 100%;
+          padding: 0.75rem;
+          background: hsl(var(--card));
+          border: 1px solid hsl(var(--border));
+          border-radius: 0.75rem;
+          color: hsl(var(--foreground));
+        ">
+      </div>
+      <div class="form-group">
+        <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Email</label>
+        <input class="form-input" id="profile-email" type="email" required style="
+          width: 100%;
+          padding: 0.75rem;
+          background: hsl(var(--card));
+          border: 1px solid hsl(var(--border));
+          border-radius: 0.75rem;
+          color: hsl(var(--foreground));
+        ">
+      </div>
+      <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem;">Сохранить изменения</button>
+      <button type="button" class="btn" style="width: 100%; background: transparent; color: hsl(var(--muted-foreground));" onclick="hideEditProfileForm()">Отмена</button>
+    </form>
+  </div>
+</div>
+</main>
+
+
+<footer style="background: hsl(var(--card)); padding: 3rem 0 2rem; margin-top: 6rem;">
+  <div class="container" style="max-width: 1200px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 2rem; margin-bottom: 2rem;">
+      <!-- Логотип и слоган -->
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; background: hsl(var(--primary)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">C</div>
+          <span style="font-weight: 800; font-size: 1.3rem; color: white;">CampusPro</span>
+        </div>
+        <p style="color: hsl(215, 20%, 65%); margin: 0;">Образование будущего — уже сегодня.</p>
+      </div>
+
+<!-- Platform -->
+<div>
+  <h3 style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 1rem;">Platform</h3>
+  <ul style="list-style: none; padding: 0; margin: 0;">
+    <li><a href="#" onclick="showPage('courses'); return false;" style="color: hsl(215, 20%, 65%); text-decoration: none; display: block; margin-bottom: 0.5rem;">Все курсы</a></li>
+    <li id="profile-link" style="display: none;"><a href="#" onclick="showPage('dashboard'); return false;" style="color: hsl(215, 20%, 65%); text-decoration: none; display: block; margin-bottom: 0.5rem;">Профиль</a></li>
+    <li><a href="#" onclick="showPage('contact'); return false;" style="color: hsl(215, 20%, 65%); text-decoration: none; display: block; margin-bottom: 0.5rem;">Контакты</a></li>
+  </ul>
+</div>
+
+      <!-- Контакты -->
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 1rem;">Контакты</h3>
+        <div style="color: hsl(215, 20%, 65%); line-height: 1.6;">
+          <p><span style="color: hsl(var(--primary));">✉️</span> hello@campus-pro.ru</p>
+          <p><span style="color: hsl(var(--primary));">📞</span> +7 (495) 123-45-67</p>
+          <p><span style="color: hsl(var(--primary));">📍</span> Балаково, Россия</p>
+        </div>
+      </div>
+
+      <!-- Соцсети -->
+      <div>
+        <h3 style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 1rem;">Мы в соцсетях</h3>
+        <div style="display: flex; gap: 1rem;">
+          <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); display: flex; align-items: center; justify-content: center; color: hsl(215, 20%, 65%); font-size: 1.2rem;">🐦</a>
+          <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); display: flex; align-items: center; justify-content: center; color: hsl(215, 20%, 65%); font-size: 1.2rem;">🔗</a>
+          <a href="#" style="width: 36px; height: 36px; border-radius: 50%; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); display: flex; align-items: center; justify-content: center; color: hsl(215, 20%, 65%); font-size: 1.2rem;">💼</a>
+        </div>
+      </div>
+    </div>
+
+    <div style="border-top: 1px solid hsl(var(--border)); padding-top: 1.5rem; text-align: center; color: hsl(215, 20%, 65%); font-size: 0.9rem;">
+      © 2026 Кампус Онлайн-профессионал. Все права защищены.
+    </div>
+  </div>
+</footer>
+
+<script>
+// 1. Сначала объявляем переменные
+let currentUser = null;
+let currentStudentCourseId = null;
+let currentStudentLecture = null;
+let editingTestDocId = null;
+let currentSearchQuery = '';
+let currentCategory = '';
+
+// 2. Сразу скрываем интерфейс при загрузке страницы
+document.body.style.opacity = '0';
+const spinner = document.getElementById('loading-spinner');
+if (spinner) spinner.style.display = 'flex';
+
+// 3. Функция экранирования HTML
+function escapeHtmlAttr(str) {
+  return str.replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+}
+
+// 4. Инициализация Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyD354hjc4NGljWpyY2UwxdpXTjHLr6Vwuo",
+  authDomain: "campus-online-pro.firebaseapp.com",
+  projectId: "campus-online-pro",
+  storageBucket: "campus-online-pro.appspot.com",
+  messagingSenderId: "253867802976",
+  appId: "1:253867802976:web:3bb8ea1a2f21dffe30de05",
+  measurementId: "G-2C2JXECT4L"
+};
+
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+function toggleDropdown() {
+  const d = document.getElementById('user-dropdown');
+  if (d) {
+    d.style.display = d.style.display === 'block' ? 'none' : 'block';
+  }
+}
+
+// 5. Функции обновления интерфейса
+function updateUserName() {
+  const userNameEl = document.getElementById('user-name');
+  if (!userNameEl) return;
+  
+  if (currentUser && currentUser.name) {
+    userNameEl.textContent = currentUser.name;
+  } else {
+    userNameEl.textContent = 'Гость';
+  }
+}
+
+function updateWelcomeMessage() {
+  const welcomeName = document.getElementById('welcome-name');
+  const welcomeNameInitial = document.getElementById('welcome-name-initial');
+  
+  if (welcomeName) {
+    if (currentUser && currentUser.name) {
+      welcomeName.textContent = `С возвращением, ${currentUser.name}!`;
+    } else {
+      welcomeName.textContent = 'С возвращением!';
+    }
+  }
+  if (welcomeNameInitial) {
+    if (currentUser && currentUser.name) {
+      welcomeNameInitial.textContent = currentUser.name.charAt(0).toUpperCase();
+    } else {
+      welcomeNameInitial.textContent = 'M';
+    }
+  }
+}
+
+function updateAuthUI() {
+  const menu = document.getElementById('user-menu');
+  const authButtons = document.getElementById('auth-buttons');
+  
+  if (currentUser) {
+    if (menu) menu.style.display = 'flex';
+    if (authButtons) authButtons.style.display = 'none';
+    updateUserName(); // ← Обновляем имя
+  } else {
+    if (menu) menu.style.display = 'none';
+    if (authButtons) authButtons.style.display = 'flex';
+  }
+  updateWelcomeMessage(); // ← Обновляем приветствие
+}
+
+// 6. Обработчик аутентификации (главное исправление!)
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // Загружаем ДАННЫЕ ПОЛЬЗОВАТЕЛЯ из Firestore (включая имя!)
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    const userData = userDoc.data();
+    
+    currentUser = {
+      id: user.uid,
+      email: user.email,
+      role: userData?.role || 'student',
+      name: userData?.name || user.email.split('@')[0] // ← Берём имя из Firestore!
+    };
+    
+    updateAuthUI();
+    showPage('dashboard');
+  } else {
+    currentUser = null;
+    updateAuthUI();
+    showPage('login');
+  }
+  
+  // ← ПОКАЗЫВАЕМ ИНТЕРФЕЙС ТОЛЬКО ПОСЛЕ ЗАГРУЗКИ ДАННЫХ!
+  document.body.style.opacity = '1';
+  if (spinner) spinner.style.display = 'none';
+});
+
+
+
+// ======================
+// ФУНКЦИЯ НАВИГАЦИИ
+// ======================
+function showPage(id) {
+    // 🔒 ПРОВЕРКА АВТОРИЗАЦИИ ДЛЯ ЗАЩИЩЁННЫХ СТРАНИЦ
+    const protectedPages = ['dashboard', 'create-course-form', 'course-detail', 'add-lecture-form', 'add-test-form'];
+  if (protectedPages.includes(id) && (!currentUser || !currentUser.id)) {
+    console.warn('⚠️ Попытка доступа к защищённой странице без авторизации');
+    alert('Пожалуйста, войдите в систему для доступа к этой странице');
+    showPage('login');
+    return;
+  }
+  // Скрываем ВСЕ страницы
+  const allPages = document.querySelectorAll('.page');
+  allPages.forEach(page => {
+    page.style.display = 'none';
+  });
+
+  // Скрываем ВСЕ специальные формы
+  const specialForms = [
+    'create-course-form',
+    'course-detail',
+    'add-lecture-form',
+    'add-test-form'
+  ];
+  
+  specialForms.forEach(formId => {
+    const form = document.getElementById(formId);
+    if (form) form.style.display = 'none';
+  });
+
+  // Показываем текущую страницу
+  const currentPage = document.getElementById(id);
+  if (currentPage) {
+    currentPage.style.display = 'block';
+    
+    // Особая логика для дашборда
+    if (id === 'dashboard') {
+      const teacherDash = document.getElementById('teacher-dashboard');
+      const studentStats = document.getElementById('student-stats');
+      const subtitle = document.getElementById('dashboard-subtitle');
+      
+      // Скрываем оба блока сначала
+      if (teacherDash) teacherDash.style.display = 'none';
+      if (studentStats) studentStats.style.display = 'none';
+      
+      // Показываем нужный в зависимости от роли
+      if (currentUser && currentUser.role === 'teacher') {
+        if (subtitle) subtitle.textContent = 'Управляйте своими курсами и следите за успехами студентов.';
+        if (teacherDash) teacherDash.style.display = 'block';
+        loadTeacherCourses();
+      } else {
+        if (subtitle) subtitle.textContent = 'Продолжайте обучение и отслеживайте свой прогресс.';
+        if (studentStats) studentStats.style.display = 'block';
+        updateStudentStats();
+      }
+    }
+    
+    // Загрузка каталога курсов
+    if (id === 'courses') {
+      loadCoursesCatalog();
+    }
+  }
+
+  // Обновляем активную навигацию
+  document.querySelectorAll('nav a').forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('onclick')?.includes(`'${id}'`)) {
+      link.classList.add('active');
+    }
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// === РЕГИСТРАЦИЯ С FIREBASE ===
+document.getElementById('register-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const role = document.getElementById('reg-role').value;
+  const name = document.getElementById('reg-name').value.trim(); // ← Имя из формы
+  
+  if (!email || !password || password.length < 6) {
+    alert('Пароль должен быть не менее 6 символов');
+    return;
+  }
+  
+  try {
+    // 1. Создаём пользователя в Firebase Auth
+    const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    // 2. Сохраняем данные в Firestore
+    await db.collection('users').doc(user.uid).set({
+       email: email,
+      name: name, 
+      role: role,
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    
+    alert('✅ Учётная запись создана!');
+    showPage('login');
+  } catch (error) {
+    let msg = error.message;
+    if (msg.includes('email-already-in-use')) {
+      msg = 'Этот email уже зарегистрирован.';
+    }
+    alert('❌ Ошибка: ' + msg);
+  }
+});
+
+// === ВХОД С FIREBASE ===
+document.getElementById('login-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+    // Пользователь загрузится автоматически через onAuthStateChanged
+  } catch (error) {
+    let msg = error.message;
+    if (msg.includes('user-not-found') || msg.includes('wrong-password')) {
+      msg = 'Неверный email или пароль.';
+    }
+    alert('❌ ' + msg);
+  }
+});
+
+document.getElementById('contact-form')?.addEventListener('submit', function(e) {
+  e.preventDefault();
+  alert('Спасибо! Ваше сообщение отправлено.');
+});
+
+// === АВТОМАТИЧЕСКАЯ ЗАГРУЗКА ПОЛЬЗОВАТЕЛЯ ===
+document.body.style.opacity = '0';
+document.getElementById('loading-spinner').style.display = 'flex';
+
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    // Загружаем данные пользователя из Firestore
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    const userData = userDoc.data();
+    currentUser = {
+      id: user.uid,
+      email: user.email,
+      role: userData?.role || 'student',
+      name: userData?.name || user.email.split('@')[0] // Используем имя из Firestore
+    };
+    updateAuthUI();
+    showPage('dashboard');
+    // После обновления интерфейса
+    document.body.style.opacity = '1';
+    document.getElementById('loading-spinner').style.display = 'none';
+  } else {
+    currentUser = null;
+    updateAuthUI();
+    showPage('login');
+    // После обновления интерфейса
+    document.body.style.opacity = '1';
+    document.getElementById('loading-spinner').style.display = 'none';
+  }
+});
+
+function logout() {
+  auth.signOut().then(() => {
+    currentUser = null;
+    updateAuthUI();
+    showPage('login');
+  });
+}
+
+
+
+// ======================
+// Преподавательский функционал
+// ======================
+let currentCourseId = null;
+let isEditingCourse = false;
+let editingCourseId = null;
+let editingLectureIndex = null;
+let editingTestIndex = null;
+let questionCounter = 0;
+
+async function loadTeacherCourses() {
+  // Проверяем авторизацию
+  if (!currentUser || !currentUser.id) {
+    console.warn('Пользователь не авторизован');
+    return;
+  }
+  
+  const container = document.getElementById('teacher-courses-list');
+  if (!container) {
+    console.warn('Контейнер курсов не найден');
+    return;
+  }
+  
+  try {
+    const snapshot = await db
+      .collection('courses')
+      .where('teacherId', '==', currentUser.id)
+      .orderBy('createdAt', 'desc')
+      .get();
+    
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: hsl(var(--muted-foreground));">У вас пока нет курсов</p>';
+      return;
+    }
+    
+    container.innerHTML = '';
+    const courses = [];
+    for (const doc of snapshot.docs) {
+      courses.push({ id: doc.id, ...doc.data() });
+    }
+    
+    courses.forEach(course => {
+  // Используем сохраненную категорию вместо определения по названию
+  let categoryIcon = '💻';
+  let categoryName = 'Программирование';
+  switch (course.category) {
+    case 'design':
+      categoryIcon = '🎨';
+      categoryName = 'Дизайн';
+      break;
+    case 'databases':
+      categoryIcon = '📊';
+      categoryName = 'Базы данных';
+      break;
+    default:
+      categoryIcon = '💻';
+      categoryName = 'Программирование';
+  }
+
+  // Уровень → метка
+  const levelLabel = 
+    course.level === 'beginner' ? 'Новичок' :
+    course.level === 'intermediate' ? 'Популярный' : 'Продвинутый';
+
+  // Длительность (примерные значения — можно взять из курса или захардкодить)
+  let durationText = '12 занятий • 4 недели';
+  if (categoryName === 'Дизайн') durationText = '16 занятий • 6 недель';
+  if (categoryName === 'Базы данных') durationText = '20 занятий • 8 недель';
+
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.style.cssText = `
+    background: hsl(var(--card));
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid hsl(var(--border));
+    transition: all 0.3s;
+  `;
+  card.innerHTML = `
+    <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+      <div style="font-size: 4rem; margin-bottom: 1rem;">${categoryIcon}</div>
+      <div style="font-size: 1.1rem; font-weight: 600; color: white;">${categoryName}</div>
+    </div>
+    <div style="padding: 1.25rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+        <span style="background: ${levelLabel === 'Новичок' ? 'hsl(var(--primary)/0.2)' : levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)/0.2' : 'hsl(var(--primary)/0.2)'}; color: ${levelLabel === 'Новичок' ? 'hsl(var(--primary))' : levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)' : 'hsl(var(--primary))'}; padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">${levelLabel}</span>
+        <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">${durationText}</span>
+      </div>
+      <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">${escapeHtmlAttr(course.title)}</h3>
+      <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+        ${escapeHtmlAttr(course.description || 'Без описания')}
+      </p>
+      <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">${durationText.split(' • ')[0].replace('занятий', 'lessons')}</div>
+      <button class="btn btn-outline" onclick="viewCourse('${course.id}')">Открыть</button>
+            <button class="btn btn-outline" style="margin-left: 0.5rem;" onclick="deleteCourse('${course.id}')">🗑️</button>
+    </div>
+  `;
+  container.appendChild(card);
+});
+
+  } catch (error) {
+    console.error(error);
+    if (container) {
+      container.innerHTML = '<p style="color: red;">Ошибка загрузки курсов</p>';
+    }
+  }
+}
+
+
+
+
+function showCreateCourseForm() {
+  console.log('showCreateCourseForm вызвана');
+  
+  showPage('dashboard');
+  
+  // Скрываем дашборд
+  const teacherDash = document.getElementById('teacher-dashboard');
+  console.log('teacher-dashboard:', teacherDash);
+  
+  if (teacherDash) {
+    teacherDash.style.display = 'none';
+  }
+  
+  // Показываем форму
+  const createForm = document.getElementById('create-course-form');
+  console.log('create-course-form:', createForm);
+  
+  if (createForm) {
+    createForm.style.display = 'block';
+  }
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function hideCreateCourseForm() {
+  console.log('hideCreateCourseForm вызвана');
+  
+  isEditingCourse = false;
+  editingCourseId = null;
+  
+  // Скрываем форму
+  const createForm = document.getElementById('create-course-form');
+  if (createForm) {
+    createForm.style.display = 'none';
+  }
+  
+  // Показываем дашборд
+  const teacherDash = document.getElementById('teacher-dashboard');
+  if (teacherDash) {
+    teacherDash.style.display = 'block';
+  }
+  
+  // Загружаем курсы (только если пользователь авторизован)
+  if (currentUser && currentUser.id) {
+    loadTeacherCourses();
+  }
+}
+
+
+function showTeacherSection(sectionId) {
+  const sections = [
+    'create-course-form',
+    'course-detail',
+    'add-lecture-form',
+    'add-test-form'
+  ];
+  
+  sections.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  
+  const target = document.getElementById(sectionId);
+  if (target) target.style.display = 'block';
+}
+
+function hideAddLectureForm() {
+  showTeacherSection('course-detail');
+  viewCourse(currentCourseId);
+}
+
+function hideAddTestForm() {
+  showTeacherSection('course-detail');
+  viewCourse(currentCourseId);
+}
+
+document.getElementById('course-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  // Проверяем существование ВСЕХ элементов формы
+  const titleEl = document.getElementById('course-title');
+  const descEl = document.getElementById('course-desc');
+  const levelEl = document.getElementById('course-level');
+  const categoryEl = document.getElementById('course-category');
+  
+  // Если хотя бы один элемент не найден — выводим ошибку
+  if (!titleEl || !descEl || !levelEl || !categoryEl) {
+    console.error('❌ Не найдены необходимые элементы формы!');
+    alert('Ошибка: не найдены поля формы. Обновите страницу и попробуйте снова.');
+    return;
+  }
+  
+  // Получаем значения
+  const title = titleEl.value.trim();
+  const desc = descEl.value.trim();
+  const level = levelEl.value;
+  const category = categoryEl.value;
+  
+  console.log('Данные формы:', { title, desc, level, category });
+  console.log('ID пользователя:', currentUser?.id);
+  
+  if (!currentUser || !currentUser.id) {
+    console.error('❌ Пользователь не авторизован!');
+    alert('Вы не авторизованы. Пожалуйста, войдите в систему.');
+    return;
+  }
+  
+  try {
+    if (isEditingCourse && editingCourseId) {
+      // Обновление существующего курса
+      await db.collection('courses').doc(editingCourseId).update({
+        title,
+        description: desc,
+        level,
+        category,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      console.log('✅ Курс обновлён');
+      alert('✅ Курс обновлён!');
+    } else {
+      // Создание нового курса
+      const courseRef = db.collection('courses').doc();
+      console.log('Создаётся курс с ID:', courseRef.id);
+      await courseRef.set({
+        id: courseRef.id,
+        title,
+        description: desc,
+        level,
+        category,
+        teacherId: currentUser.id,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      console.log('✅ Курс успешно создан!');
+      alert('✅ Курс создан!');
+    }
+    
+    isEditingCourse = false;
+    editingCourseId = null;
+    hideCreateCourseForm();
+  } catch (error) {
+    console.error('❌ Ошибка при сохранении курса:', error);
+    console.error('Текст ошибки:', error.message);
+    alert('❌ Ошибка при сохранении курса: ' + error.message);
+  }
+});
+  
+
+function backToCourses() {
+  showTeacherSection('teacher-dashboard');
+  loadTeacherCourses();
+}
+
+function showAddLectureForm() {
+  document.getElementById('lecture-course-id').value = currentCourseId;
+  showTeacherSection('add-lecture-form');
+}
+
+
+
+function showAddTestForm() {
+  document.getElementById('test-course-id').value = currentCourseId;
+  showTeacherSection('add-test-form');
+}
+
+
+
+async function viewCourse(courseId) {
+  currentCourseId = courseId;
+  try {
+    const courseDoc = await db.collection('courses').doc(courseId).get();
+    if (!courseDoc.exists) return;
+
+    const course = courseDoc.data();
+    document.getElementById('detail-course-title').textContent = course.title;
+    document.getElementById('detail-course-desc').textContent = course.description || '—';
+    document.getElementById('detail-course-level').textContent =
+      ({beginner: 'Новичок', intermediate: 'Средний', advanced: 'Продвинутый'})[course.level];
+
+// Лекции
+const lectureList = document.getElementById('lecture-list');
+const lecSnapshot = await db.collection(`courses/${courseId}/lectures`).orderBy('order', 'asc').get();
+
+if (lecSnapshot.empty) {
+  lectureList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет лекций</p>';
+} else {
+ lectureList.innerHTML = lecSnapshot.docs.map((doc, i) => {
+    const lec = doc.data();
+    // ✅ Правильная проверка наличия файла
+    const fileButton = lec.fileUrl ? 
+        `<a href="${lec.fileUrl}" target="_blank" style="margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.85rem;" class="btn btn-outline">📎 Файл</a>` : 
+        '';
+    
+    return `
+    <div class="card" style="margin-bottom: 1rem;">
+        <div class="card-content">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                <strong>Лекция ${i + 1}: ${lec.title}</strong>
+                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="editLecture('${courseId}', '${doc.id}')">✏️</button>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <button class="btn btn-outline" onclick="viewLecture('${courseId}', ${i})">Открыть</button>
+                ${fileButton}
+            </div>
+        </div>
+    </div>
+    `;
+}).join('');
+}
+
+    // Тесты
+    const testList = document.getElementById('test-list');
+    const testSnapshot = await db.collection(`courses/${courseId}/tests`).get();
+    if (testSnapshot.empty) {
+      testList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет тестов</p>';
+    } else {
+      testList.innerHTML = testSnapshot.docs.map((doc, i) => {
+        const test = doc.data();
+        return `
+          <div style="background: hsl(var(--card)); padding: 1rem; border-radius: var(--radius); margin-bottom: 0.75rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+              <strong>Тест ${i + 1}: ${test.title}</strong>
+              <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="editTest('${courseId}', '${doc.id}')">✏️</button>
+            </div>
+            <p>Вопросов: ${test.questions?.length || 0}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    showTeacherSection('course-detail');
+  } catch (error) {
+    console.error(error);
+    alert('❌ Ошибка загрузки курса.');
+  }
+}
+
+  showTeacherSection('course-detail');
+
+
+
+// Редактирование лекций (через Firestore)
+let editingLectureDocId = null; // ← храним ID документа Firestore, а не индекс
+
+function editLecture(courseId, lectureDocId) {
+  editingLectureDocId = lectureDocId;
+  currentCourseId = courseId;
+
+  db.collection(`courses/${courseId}/lectures`).doc(lectureDocId).get().then(doc => {
+    if (doc.exists) {
+      const lec = doc.data();
+      document.getElementById('lecture-course-id').value = courseId;
+      document.getElementById('lecture-title').value = lec.title;
+      document.getElementById('lecture-content').value = lec.content || '';
+      showAddLectureForm();
+      const submitBtn = document.querySelector('#lecture-form button[type="submit"]');
+      if (submitBtn) submitBtn.textContent = 'Сохранить изменения';
+    }
+  });
+}
+
+document.getElementById('lecture-form')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const courseId = document.getElementById('lecture-course-id').value;
+    const title = document.getElementById('lecture-title').value;
+    const content = document.getElementById('lecture-content').value;
+    
+    const lectureData = { 
+        title, 
+        content, 
+        order: Date.now(),
+        fileUrl: uploadedFileUrl, // ← Сохраняем URL файла
+        fileName: document.getElementById('lecture-file').files[0]?.name || null
+    };
+    
+    try {
+        if (editingLectureDocId) {
+            await db.collection(`courses/${courseId}/lectures`).doc(editingLectureDocId).update(lectureData);
+            alert('✅ Лекция обновлена!');
+        } else {
+            await db.collection(`courses/${courseId}/lectures`).add(lectureData);
+            alert('✅ Лекция добавлена!');
+        }
+        editingLectureDocId = null;
+        uploadedFileUrl = null;
+        document.getElementById('lecture-file').value = ''; // ← Очистить поле файла
+        hideAddLectureForm();
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('❌ Не удалось сохранить лекцию');
+    }
+});
+
+
+// Редактирование тестов
+async function editTest(courseId, testDocId) {
+  try {
+    // Получаем документ теста из Firestore
+    const testDoc = await db.collection(`courses/${courseId}/tests`).doc(testDocId).get();
+    
+    if (!testDoc.exists) {
+      alert('Тест не найден.');
+      return;
+    }
+
+    const test = testDoc.data();
+    currentCourseId = courseId;
+    editingTestDocId = testDocId; // ← храним ID документа, а не индекс
+
+    document.getElementById('test-course-id').value = courseId;
+    document.getElementById('test-title').value = test.title;
+
+    document.getElementById('questions-container').innerHTML = '';
+    questionCounter = 0;
+    test.questions.forEach(q => addQuestionField(q));
+
+    showAddTestForm();
+    const submitBtn = document.querySelector('#test-form button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Сохранить изменения';
+  } catch (error) {
+    console.error('Ошибка загрузки теста:', error);
+    alert('❌ Не удалось загрузить тест для редактирования.');
+  }
+}
+
+function addQuestionField(questionData = null) {
+  const container = document.getElementById('questions-container');
+  const idx = questionCounter++;
+  const q = questionData || { text: '', type: 'single', options: [{ text: '', correct: false }, { text: '', correct: false }] };
+
+  const questionEl = document.createElement('div');
+  questionEl.className = 'card';
+  questionEl.draggable = true;
+  questionEl.dataset.questionIndex = idx;
+  questionEl.innerHTML = `
+    <div class="card-content" style="padding: 1rem;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+        <strong>Вопрос ${idx + 1}</strong>
+        <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeQuestion(this)">🗑️</button>
+      </div>
+      <div class="form-group">
+        <input class="form-input" placeholder="Текст вопроса" value="${q.text}" data-type="question-text" required>
+      </div>
+      <div class="form-group">
+        <label><input type="radio" name="q-type-${idx}" value="single" ${q.type === 'single' ? 'checked' : ''} onchange="toggleQuestionType(this, ${idx})"> Один правильный ответ</label>
+        <label style="margin-left: 1rem;"><input type="radio" name="q-type-${idx}" value="multiple" ${q.type === 'multiple' ? 'checked' : ''} onchange="toggleQuestionType(this, ${idx})"> Несколько правильных ответов</label>
+      </div>
+      <div class="form-group" id="options-${idx}">
+        ${q.options.map((opt, i) => `
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+            <input type="text" class="form-input" placeholder="Вариант ответа" value="${opt.text}" style="flex: 1;" data-type="option-text">
+            <input type="checkbox" ${opt.correct ? 'checked' : ''} data-type="option-correct">
+            <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
+          </div>
+        `).join('')}
+        <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addOption(this)">+ Вариант</button>
+      </div>
+    </div>
+  `;
+  container.appendChild(questionEl);
+
+  questionEl.addEventListener('dragstart', (e) => {
+    e.dataTransfer.setData('text/plain', idx);
+    setTimeout(() => questionEl.classList.add('dragging'), 0);
+  });
+  questionEl.addEventListener('dragend', () => {
+    questionEl.classList.remove('dragging');
+  });
+}
+
+function toggleQuestionType(radio, idx) {
+  if (radio.value === 'single') {
+    const checkboxes = document.querySelectorAll(`#options-${idx} [data-type="option-correct"]`);
+    for (let i = 1; i < checkboxes.length; i++) {
+      checkboxes[i].checked = false;
+    }
+  }
+}
+
+function addOption(button) {
+  const optionDiv = document.createElement('div');
+  optionDiv.style.display = 'flex';
+  optionDiv.style.gap = '0.5rem';
+  optionDiv.style.marginBottom = '0.5rem';
+  optionDiv.innerHTML = `
+    <input type="text" class="form-input" placeholder="Вариант ответа" style="flex: 1;" data-type="option-text">
+    <input type="checkbox" data-type="option-correct">
+    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
+  `;
+  button.parentNode.insertBefore(optionDiv, button);
+}
+
+function removeOption(button) {
+  button.closest('div[style*="flex"]').remove();
+}
+
+function removeQuestion(button) {
+  button.closest('.card').remove();
+}
+
+document.getElementById('questions-container').addEventListener('dragover', (e) => {
+  e.preventDefault();
+  const afterElement = getDragAfterElement(document.getElementById('questions-container'), e.clientY);
+  const draggable = document.querySelector('.dragging');
+  if (afterElement == null) {
+    document.getElementById('questions-container').appendChild(draggable);
+  } else {
+    document.getElementById('questions-container').insertBefore(draggable, afterElement);
+  }
+});
+
+function getDragAfterElement(container, y) {
+  const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
+  return draggableElements.reduce((closest, child) => {
+    const box = child.getBoundingClientRect();
+    const offset = y - box.top - box.height / 2;
+    if (offset < 0 && offset > closest.offset) {
+      return { offset: offset, element: child };
+    } else {
+      return closest;
+    }
+  }, { offset: Number.NEGATIVE_INFINITY }).element;
+}
+
+document.getElementById('test-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const courseId = document.getElementById('test-course-id').value;
+  const title = document.getElementById('test-title').value.trim();
+  if (!title) {
+    alert('⚠️ Укажите название теста.');
+    return;
+  }
+
+  const questionsEls = document.querySelectorAll('#questions-container .card');
+  if (questionsEls.length === 0) {
+    alert('⚠️ Добавьте хотя бы один вопрос.');
+    return;
+  }
+
+  const questions = [];
+  for (const el of questionsEls) {
+    const qText = el.querySelector('[data-type="question-text"]').value.trim();
+    if (!qText) {
+      alert('⚠️ Заполните текст вопроса.');
+      return;
+    }
+
+    const type = el.querySelector('input[name^="q-type"]:checked').value;
+    const optionInputs = el.querySelectorAll('[data-type="option-text"]');
+    const correctInputs = el.querySelectorAll('[data-type="option-correct"]');
+
+    const options = [];
+    let hasCorrect = false;
+    for (let i = 0; i < optionInputs.length; i++) {
+      const text = optionInputs[i].value.trim();
+      if (!text) continue;
+      const correct = correctInputs[i].checked;
+      if (correct) hasCorrect = true;
+      options.push({ text, correct });
+    }
+
+    if (options.length < 2) {
+      alert('⚠️ Каждый вопрос должен иметь минимум 2 варианта ответа.');
+      return;
+    }
+    if (!hasCorrect) {
+      alert('⚠️ Укажите хотя бы один правильный ответ.');
+      return;
+    }
+    if (type === 'single' && options.filter(o => o.correct).length > 1) {
+      alert('⚠️ Для вопроса с одним ответом можно выбрать только один правильный вариант.');
+      return;
+    }
+
+    questions.push({ text: qText, type, options });
+  }
+
+  try {
+    if (editingTestDocId) {
+      // Обновление существующего теста
+      await db.collection(`courses/${courseId}/tests`).doc(editingTestDocId).update({ title, questions });
+      alert('✅ Тест обновлён!');
+    } else {
+      // Создание нового теста
+      await db.collection(`courses/${courseId}/tests`).add({ title, questions });
+      alert('✅ Тест успешно создан!');
+    }
+
+    editingTestDocId = null;
+    const submitBtn = document.querySelector('#test-form button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Создать тест';
+
+    hideAddTestForm();
+  } catch (error) {
+    console.error('Ошибка сохранения теста:', error);
+    alert('❌ Не удалось сохранить тест. Попробуйте позже.');
+  }
+});
+
+async function deleteCourse(courseId) {
+  if (!confirm('Вы уверены, что хотите удалить курс и всё его содержимое?')) return;
+
+  try {
+    // Удаляем все лекции
+    const lecSnapshot = await db.collection(`courses/${courseId}/lectures`).get();
+    const lecBatch = db.batch();
+    lecSnapshot.docs.forEach(doc => lecBatch.delete(doc.ref));
+    await lecBatch.commit();
+
+    // Удаляем все тесты
+    const testSnapshot = await db.collection(`courses/${courseId}/tests`).get();
+    const testBatch = db.batch();
+    testSnapshot.docs.forEach(doc => testBatch.delete(doc.ref));
+    await testBatch.commit();
+
+    // Удаляем сам курс
+    await db.collection('courses').doc(courseId).delete();
+
+    // Удаляем прогресс студентов по этому курсу (опционально)
+    // Можно оставить, если хотите сохранить историю
+    // Но обычно при удалении курса удаляют и связанный прогресс
+
+    alert('🗑️ Курс удалён.');
+    backToCourses();
+  } catch (error) {
+    console.error('Ошибка при удалении курса:', error);
+    alert('❌ Не удалось удалить курс. Попробуйте позже.');
+  }
+}
+
+async function editCurrentCourse() {
+  try {
+    const courseDoc = await db.collection('courses').doc(currentCourseId).get();
+    if (!courseDoc.exists) {
+      alert('Курс не найден.');
+      return;
+    }
+    const course = courseDoc.data();
+    isEditingCourse = true;
+    editingCourseId = currentCourseId;
+    document.getElementById('course-title').value = course.title;
+    document.getElementById('course-desc').value = course.description || '';
+    document.getElementById('course-level').value = course.level;
+    // Добавляем заполнение категории
+    document.getElementById('course-category').value = course.category || 'programming';
+    showCreateCourseForm();
+  } catch (error) {
+    console.error('Ошибка загрузки курса для редактирования:', error);
+    alert('❌ Не удалось загрузить курс для редактирования.');
+  }
+}
+
+
+// ======================
+// Каталог курсов
+// ======================
+async function loadCoursesCatalog() {
+  console.log('=== loadCoursesCatalog вызвана ===');
+  const container = document.getElementById('dynamic-courses-list');
+  if (!container) {
+    console.error('❌ Контейнер dynamic-courses-list не найден!');
+    return;
+  }
+  
+  try {
+    console.log('⏳ Загрузка курсов из базы данных...');
+    const snapshot = await db.collection('courses').get();
+    console.log(`✅ Загружено курсов: ${snapshot.size}`);
+    container.innerHTML = '';
+    
+    if (snapshot.empty) {
+      container.innerHTML = '<p style="text-align: center; color: hsl(var(--muted-foreground)); grid-column: 1 / -1; padding: 3rem;">Нет доступных курсов</p>';
+      return;
+    }
+    
+    // Формируем список курсов
+    const courses = [];
+    snapshot.forEach(doc => {
+      courses.push({ id: doc.id, ...doc.data() });
+    });
+    
+    // Фильтруем курсы
+    const filteredCourses = courses.filter(course => {
+      // Поиск по названию и описанию
+      const matchesSearch = currentSearchQuery === '' || 
+        course.title.toLowerCase().includes(currentSearchQuery.toLowerCase()) || 
+        (course.description && course.description.toLowerCase().includes(currentSearchQuery.toLowerCase()));
+      
+      // Фильтр по категории (используем поле course.category)
+      const matchesCategory = currentCategory === '' || 
+        (course.category && course.category === currentCategory);
+      
+      return matchesSearch && matchesCategory;
+    });
+    
+    // Генерируем современные карточки
+    container.innerHTML = filteredCourses.map(course => {
+      // Категория
+      let categoryIcon = '💻';
+      let categoryName = 'Программирование';
+      switch (course.category) {
+        case 'design':
+          categoryIcon = '🎨';
+          categoryName = 'Дизайн';
+          break;
+        case 'databases':
+          categoryIcon = '📊';
+          categoryName = 'Базы данных';
+          break;
+        default:
+          categoryIcon = '💻';
+          categoryName = 'Программирование';
+      }
+      
+      // Уровень
+      const levelLabel = 
+        course.level === 'beginner' ? 'Новичок' :
+        course.level === 'intermediate' ? 'Популярный' : 'Продвинутый';
+      
+      // Длительность
+      let durationText = '12 занятий • 4 недели';
+      if (categoryName === 'Дизайн') durationText = '16 занятий • 6 недель';
+      if (categoryName === 'Базы данных') durationText = '20 занятий • 8 недель';
+      
+      const safeId = course.id.replace(/'/g, "\\'");
+      return `
+        <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+          <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">${categoryIcon}</div>
+            <div style="font-size: 1.1rem; font-weight: 600; color: white;">${categoryName}</div>
+          </div>
+          <div style="padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span style="background: ${levelLabel === 'Новичок' ? 'hsl(var(--primary)/0.2)' : levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)/0.2' : 'hsl(var(--primary)/0.2)'}; color: ${levelLabel === 'Новичок' ? 'hsl(var(--primary))' : levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)' : 'hsl(var(--primary))'}; padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">${levelLabel}</span>
+              <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">${durationText}</span>
+            </div>
+            <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">${escapeHtmlAttr(course.title)}</h3>
+            <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+              ${escapeHtmlAttr(course.description || 'Без описания')}
+            </p>
+            <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">${durationText.split(' • ')[0].replace('занятий', 'lessons')}</div>
+            <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem; box-shadow: 0 0 15px hsl(var(--primary)/0.4);" onclick="viewCourseAsStudent('${safeId}')">
+              Начать курс
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  } catch (error) {
+    console.error('❌ Ошибка загрузки курсов:', error);
+    container.innerHTML = '<p style="color: red; text-align: center; grid-column: 1 / -1; padding: 3rem;">Не удалось загрузить курсы</p>';
+  }
+}
+
+
+
+// ======================
+// Функционал студента
+// ======================
+
+
+async function viewCourseAsStudent(courseId) {
+  if (!currentUser || currentUser.role !== 'student') {
+    alert('❌ Для просмотра курса необходимо войти как студент.');
+    showPage('login');
+    return;
+  }
+
+  currentStudentCourseId = courseId;
+
+  try {
+    // Загружаем курс
+    const courseDoc = await db.collection('courses').doc(courseId).get();
+    if (!courseDoc.exists) {
+      alert('Курс не найден.');
+      return;
+    }
+    const course = courseDoc.data();
+
+    // Загружаем прогресс студента
+    let progressDoc = await db.collection('studentProgress').doc(currentUser.id).get();
+    let progressData = {};
+    if (!progressDoc.exists || !progressDoc.data()[courseId]) {
+      // Инициализируем прогресс
+      await db.collection('studentProgress').doc(currentUser.id).set({
+        [courseId]: {
+          completedLectures: {},
+          testResults: []
+        }
+      }, { merge: true });
+      progressData = { completedLectures: {}, testResults: [] };
+    } else {
+      progressData = progressDoc.data()[courseId];
+    }
+
+    // Отображение...
+    document.getElementById('view-course-title').textContent = course.title;
+    document.getElementById('view-course-desc').textContent = course.description || '—';
+
+  // Лекции
+const lectureList = document.getElementById('student-lecture-list');
+const lecSnapshot = await db.collection(`courses/${courseId}/lectures`).orderBy('order', 'asc').get();
+
+if (lecSnapshot.empty) {
+  lectureList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет лекций</p>';
+} else {
+  lectureList.innerHTML = lecSnapshot.docs.map((doc, i) => {
+    const lec = doc.data();
+    const isCompleted = progressData.completedLectures[i] || false;
+    const hasFile = lec.fileUrl ? true : false;
+    
+    return `
+    <div class="card" style="margin-bottom: 1rem;">
+      <div class="card-content">
+        <h3>Лекция ${i + 1}: ${lec.title}</h3>
+        
+        ${hasFile ? `
+          <div style="background: hsl(var(--primary)/0.1); padding: 0.75rem; border-radius: 0.5rem; margin: 0.75rem 0; display: flex; align-items: center; gap: 0.5rem;">
+            <span style="font-size: 1.2rem;">📎</span>
+            <a href="${lec.fileUrl}" target="_blank" style="color: hsl(var(--primary)); text-decoration: underline; flex: 1;">
+              ${lec.fileName || 'Скачать файл'}
+            </a>
+          </div>
+        ` : ''}
+        
+        <button class="btn btn-outline" onclick="viewLecture('${courseId}', ${i})">Читать</button>
+        <label style="display: block; margin-top: 0.75rem; font-size: 0.9rem;">
+          <input type="checkbox" ${isCompleted ? 'checked' : ''} disabled> Прочитано
+        </label>
+      </div>
+    </div>
+    `;
+  }).join('');
+}
+
+    // Тесты
+    const testList = document.getElementById('student-test-list');
+    const testSnapshot = await db.collection(`courses/${courseId}/tests`).get();
+    if (testSnapshot.empty) {
+      testList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет тестов</p>';
+    } else {
+      testList.innerHTML = testSnapshot.docs.map((doc, i) => {
+        const test = doc.data();
+        const result = progressData.testResults?.find(r => r.testIndex === i);
+        if (result) {
+          return `<div class="card" style="margin-bottom: 1rem;">
+            <div class="card-content">
+              <h3>Тест ${i + 1}: ${test.title}</h3>
+              <p>✅ Пройден. Оценка: ${result.score}%</p>
+              <button class="btn btn-outline" onclick="retakeTest('${courseId}', ${i})">Повторить</button>
+            </div>
+          </div>`;
+        } else {
+          return `<div class="card" style="margin-bottom: 1rem;">
+            <div class="card-content">
+              <h3>Тест ${i + 1}: ${test.title}</h3>
+              <p>Вопросов: ${test.questions?.length || 0}</p>
+              <button class="btn btn-primary" onclick="startTest('${courseId}', ${i})">Начать тест</button>
+            </div>
+          </div>`;
+        }
+      }).join('');
+    }
+
+    showPage('course-view');
+  } catch (error) {
+    console.error(error);
+    alert('❌ Ошибка загрузки курса.');
+  }
+}
+
+
+// Прохождение теста
+
+function retakeTest(courseId, testIndex) {
+  console.log('retakeTest called with:', courseId, testIndex);
+  startTest(courseId, testIndex);
+}
+
+async function startTest(courseId, testIndex) {
+  console.log('startTest called with:', courseId, testIndex);
+
+  try {
+    // Проверяем существование курса
+    const courseDoc = await db.collection('courses').doc(courseId).get();
+    if (!courseDoc.exists) {
+      alert('Курс не найден.');
+      return;
+    }
+
+    // Получаем все тесты курса из подколлекции
+    const testSnapshot = await db.collection(`courses/${courseId}/tests`).get();
+    const tests = testSnapshot.docs.map(doc => doc.data());
+
+    // Проверяем, существует ли тест с таким индексом
+    if (testIndex < 0 || testIndex >= tests.length) {
+      alert('Тест не найден.');
+      return;
+    }
+
+    const test = tests[testIndex];
+    window.currentStudentTest = { courseId, testIndex };
+    window.currentStudentCourseId = courseId;
+
+    document.getElementById('test-view-title').textContent = test.title;
+
+    // Генерация HTML для вопросов
+    let html = '';
+    test.questions.forEach((q, qi) => {
+      html += `<div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-content">
+          <h3>Вопрос ${qi + 1}</h3>
+          <p>${q.text}</p>`;
+
+      if (q.type === 'single') {
+        q.options.forEach((opt, oi) => {
+          html += `<label style="display: block; margin: 0.5rem 0;">
+            <input type="radio" name="q${qi}" value="${oi}"> ${opt.text}
+          </label>`;
+        });
+      } else {
+        q.options.forEach((opt, oi) => {
+          html += `<label style="display: block; margin: 0.5rem 0;">
+            <input type="checkbox" name="q${qi}_${oi}" value="${oi}"> ${opt.text}
+          </label>`;
+        });
+      }
+      html += `</div></div>`;
+    });
+
+    document.getElementById('test-questions-container').innerHTML = html;
+    showPage('test-view');
+  } catch (error) {
+    console.error('Ошибка в startTest:', error);
+    alert('❌ Не удалось загрузить тест. Попробуйте позже.');
+  }
+}
+
+async function submitTest() {
+  if (!window.currentStudentTest) {
+    alert('Тест не загружен.');
+    return;
+  }
+
+  const { courseId, testIndex } = window.currentStudentTest;
+
+  try {
+    // Загружаем тест из Firestore
+    const courseDoc = await db.collection('courses').doc(courseId).get();
+    if (!courseDoc.exists) {
+      alert('Курс не найден.');
+      return;
+    }
+
+    const testSnapshot = await db.collection(`courses/${courseId}/tests`).get();
+    const tests = testSnapshot.docs.map(doc => doc.data());
+    const currentTest = tests[testIndex];
+
+    if (!currentTest) {
+      alert('Тест не найден.');
+      return;
+    }
+
+    let correctAnswers = 0;
+    let totalQuestions = currentTest.questions.length;
+
+    // Проверяем ответы
+    for (let qi = 0; qi < currentTest.questions.length; qi++) {
+      const q = currentTest.questions[qi];
+      let userAnswer = [];
+
+      if (q.type === 'single') {
+        const selected = document.querySelector(`input[name="q${qi}"]:checked`);
+        if (selected) {
+          userAnswer = [parseInt(selected.value)];
+        }
+      } else {
+        q.options.forEach((opt, oi) => {
+          const cb = document.querySelector(`input[name="q${qi}_${oi}"]`);
+          if (cb && cb.checked) userAnswer.push(oi);
+        });
+      }
+
+      const correctIndices = q.options.map((opt, i) => opt.correct ? i : -1).filter(i => i !== -1);
+
+      if (q.type === 'single') {
+        if (userAnswer.length === 1 && correctIndices.includes(userAnswer[0])) {
+          correctAnswers++;
+        }
+      } else {
+        if (
+          userAnswer.length === correctIndices.length &&
+          userAnswer.every(idx => correctIndices.includes(idx)) &&
+          correctIndices.every(idx => userAnswer.includes(idx))
+        ) {
+          correctAnswers++;
+        }
+      }
+    }
+
+    const score = Math.round((correctAnswers / totalQuestions) * 100);
+    const newResult = {
+      testIndex: testIndex,
+      testName: currentTest.title,
+      score: score,
+      date: new Date().toISOString().split('T')[0]
+    };
+
+    // Сохраняем результат в Firestore
+    await db.collection('studentProgress').doc(currentUser.id).set({
+      [courseId]: {
+        testResults: firebase.firestore.FieldValue.arrayUnion(newResult)
+      }
+    }, { merge: true });
+
+    // Обновляем статистику
+    updateStudentStats();
+
+  // Отображаем результат
+const resultDiv = document.getElementById('test-result');
+const safeCourseId = courseId.replace(/'/g, "\\'"); // ← ЭКРАНИРОВАНИЕ
+resultDiv.innerHTML = `
+  <div style="color: hsl(var(--primary)); font-weight: bold; margin-bottom: 1rem; font-size: 1.3rem;">
+    ✅ Тест завершён!
+  </div>
+  <div style="margin: 0.5rem 0;">Правильных ответов: <strong>${correctAnswers} из ${totalQuestions}</strong></div>
+  <div style="margin: 0.5rem 0;">Оценка: <strong>${score}%</strong></div>
+  <button class="btn btn-outline" style="margin-top: 1.5rem; padding: 0.5rem 1.5rem;" onclick="viewCourseAsStudent('${safeCourseId}')">
+    Вернуться к курсу
+  </button>
+`;
+resultDiv.style.display = 'block';
+
+    // Скрываем вопросы и кнопку "Завершить тест"
+    document.getElementById('test-questions-container').style.display = 'none';
+    document.querySelector('#test-view .btn-primary').style.display = 'none';
+
+  } catch (error) {
+    console.error('Ошибка при отправке теста:', error);
+    alert('❌ Не удалось отправить тест. Попробуйте позже.');
+  }
+}
+
+
+// Просмотр лекции
+async function viewLecture(courseId, lectureIndex) {
+  try {
+    // Получаем лекции курса из Firestore
+    const lecSnapshot = await db.collection(`courses/${courseId}/lectures`).orderBy('order', 'asc').get();
+    
+    // Проверяем, существует ли лекция с таким индексом
+    if (lectureIndex < 0 || lectureIndex >= lecSnapshot.docs.length) {
+      alert('Лекция не найдена.');
+      return;
+    }
+
+    const lecture = lecSnapshot.docs[lectureIndex].data();
+
+    // Сохраняем контекст для возврата
+    if (currentUser?.role === 'student') {
+      currentStudentLecture = { courseId, lectureIndex };
+      currentStudentCourseId = courseId;
+    } else {
+      window.teacherViewing = { courseId, lectureIndex };
+    }
+
+    // Отображаем лекцию
+    document.getElementById('lecture-view-title').textContent = `Лекция ${lectureIndex + 1}: ${lecture.title}`;
+    document.getElementById('lecture-view-content').innerHTML = `<p>${lecture.content || 'Без содержания'}</p>`;
+
+    // Управляем чекбоксом "Прочитано"
+    const checkbox = document.getElementById('lecture-completed');
+    if (currentUser?.role === 'student') {
+      checkbox.style.display = 'inline';
+      
+      // Загружаем прогресс из Firestore
+      const progressDoc = await db.collection('studentProgress').doc(currentUser.id).get();
+      const progressData = progressDoc.exists ? progressDoc.data() : {};
+      const isCompleted = progressData[courseId]?.completedLectures?.[lectureIndex] || false;
+      checkbox.checked = isCompleted;
+    } else {
+      checkbox.style.display = 'none'; // Преподавателю не показываем
+    }
+
+    showPage('lecture-view');
+  } catch (error) {
+    console.error('Ошибка загрузки лекции:', error);
+    alert('❌ Не удалось загрузить лекцию.');
+  }
+}
+
+function backToCourse() {
+    if (currentUser?.role === 'student' && currentStudentCourseId) {
+        viewCourseAsStudent(currentStudentCourseId);
+    } else if (currentUser?.role === 'teacher' && window.teacherViewing) {
+        viewCourse(window.teacherViewing.courseId);
+        delete window.teacherViewing;
+    } else {
+        showPage('courses');
+    }
+}
+
+async function loadStudentCourses() {
+  if (!currentUser || !currentUser.id) return;
+  try {
+    // Получаем курсы, на которые подписан студент
+    const subscriptions = await db
+      .collection('subscriptions')
+      .where('studentId', '==', currentUser.id)
+      .get();
+    const container = document.getElementById('active-student-courses');
+    const noCourses = document.getElementById('no-active-courses');
+    if (subscriptions.empty) {
+      if (noCourses) noCourses.style.display = 'block';
+      if (container) container.innerHTML = '';
+      return;
+    }
+    if (noCourses) noCourses.style.display = 'none';
+    if (!container) return;
+    container.innerHTML = '';
+    for (const sub of subscriptions.docs) {
+      const courseId = sub.data().courseId;
+      const courseDoc = await db.collection('courses').doc(courseId).get();
+      if (courseDoc.exists) {
+        const course = courseDoc.data();
+        
+        // Определяем категорию по названию
+        let categoryIcon = '💻';
+        let categoryName = 'Программирование';
+        if (course.title.toLowerCase().includes('дизайн') || 
+            course.title.toLowerCase().includes('ui') || 
+            course.title.toLowerCase().includes('figma')) {
+          categoryIcon = '🎨';
+          categoryName = 'Дизайн';
+        } else if (course.title.toLowerCase().includes('баз') || 
+                 course.title.toLowerCase().includes('данных') || 
+                 course.title.toLowerCase().includes('sql') || 
+                 course.title.toLowerCase().includes('pandas')) {
+          categoryIcon = '📊';
+          categoryName = 'Базы данных';
+        }
+        
+        // Уровень → метка
+        const levelLabel = 
+          course.level === 'beginner' ? 'Новичок' :
+          course.level === 'intermediate' ? 'Популярный' : 'Продвинутый';
+        
+        // Длительность
+        let durationText = '12 занятий • 4 недели';
+        if (categoryName === 'Дизайн') durationText = '16 занятий • 6 недель';
+        if (categoryName === 'Базы данных') durationText = '20 занятий • 8 недель';
+        
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cssText = `
+          background: hsl(var(--card));
+          border-radius: 1rem;
+          overflow: hidden;
+          border: 1px solid hsl(var(--border));
+          transition: all 0.3s;
+        `;
+        card.innerHTML = `
+          <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">${categoryIcon}</div>
+            <div style="font-size: 1.1rem; font-weight: 600; color: white;">${categoryName}</div>
+          </div>
+          <div style="padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span style="background: ${levelLabel === 'Новичок' ? 'hsl(var(--primary)/0.2)' : 
+                levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)/0.2' : 'hsl(var(--primary)/0.2)'}; 
+                color: ${levelLabel === 'Новичок' ? 'hsl(var(--primary))' : 
+                levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)' : 'hsl(var(--primary))'}; 
+                padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">${levelLabel}</span>
+              <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">${durationText}</span>
+            </div>
+            <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">${escapeHtmlAttr(course.title)}</h3>
+            <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+              ${escapeHtmlAttr(course.description || 'Без описания')}
+            </p>
+            <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">${durationText.split(' • ')[0].replace('занятий', 'lessons')}</div>
+            <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem; box-shadow: 0 0 15px hsl(var(--primary)/0.4);"
+                    onclick="viewCourseAsStudent('${courseId}')">
+              Продолжить
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки курсов студента:', error);
+  }
+}
+
+
+async function loadGrades() {
+  if (!currentUser || !currentUser.id) return;
+  
+  try {
+    const results = await db
+      .collection('testResults')
+      .where('studentId', '==', currentUser.id)
+      .orderBy('timestamp', 'desc')
+      .limit(20)
+      .get();
+    
+    const tableBody = document.getElementById('grades-table');
+    if (!tableBody) return;
+    
+    if (results.empty) {
+      tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Нет оценок</td></tr>';
+      return;
+    }
+    
+    tableBody.innerHTML = '';
+    
+    for (const doc of results.docs) {
+      const data = doc.data();
+      const course = await db.collection('courses').doc(data.courseId).get();
+      
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${course.exists ? escapeHtmlAttr(course.data().title) : 'Неизвестный курс'}</td>
+        <td>${data.type === 'test' ? 'Тест' : 'Лекция'}</td>
+        <td>${escapeHtmlAttr(data.title || 'Без названия')}</td>
+        <td>${data.type === 'test' ? (data.score || 0) + '%' : '✓'}</td>
+        <td>${data.timestamp?.toDate().toLocaleDateString('ru-RU') || '-'}</td>
+      `;
+      tableBody.appendChild(row);
+    }
+  } catch (error) {
+    console.error('Ошибка загрузки оценок:', error);
+  }
+}
+
+async function clearGrades() {
+  if (!currentUser || currentUser.role !== 'student') {
+    alert('❌ Эта функция доступна только студентам.');
+    return;
+  }
+
+  if (!confirm('Вы уверены, что хотите удалить всю историю оценок? Это действие нельзя отменить.')) {
+    return;
+  }
+
+  try {
+    // Получаем текущий прогресс студента
+    const progressDoc = await db.collection('studentProgress').doc(currentUser.id).get();
+    
+    if (!progressDoc.exists || !progressDoc.data()) {
+      alert('ℹ️ Нет сохранённых оценок.');
+      return;
+    }
+
+    const currentData = progressDoc.data();
+    const updatedData = {};
+
+    // Сохраняем курсы, но очищаем testResults
+    for (const courseId in currentData) {
+      updatedData[courseId] = {
+        completedLectures: currentData[courseId].completedLectures || {},
+        testResults: [] // ← очищаем только оценки
+      };
+    }
+
+    // Обновляем документ в Firestore
+    await db.collection('studentProgress').doc(currentUser.id).set(updatedData);
+
+    updateStudentStats(); // Обновляем интерфейс
+    alert('✅ История оценок успешно очищена.');
+  } catch (error) {
+    console.error('Ошибка при очистке оценок:', error);
+    alert('❌ Не удалось очистить оценки. Попробуйте позже.');
+  }
+}
+
+async function toggleLectureCompleted() {
+  if (!currentUser || !currentStudentLecture) return;
+  const { courseId, lectureIndex } = currentStudentLecture;
+  const checked = document.getElementById('lecture-completed').checked;
+
+  try {
+    await db.collection('studentProgress').doc(currentUser.id).set({
+      [courseId]: {
+        completedLectures: {
+          [lectureIndex]: checked
+        }
+      }
+    }, { merge: true });
+  } catch (error) {
+    console.error(error);
+    alert('❌ Не удалось сохранить прогресс.');
+  }
+}
+
+async function viewStudentCourse(courseId) {
+  try {
+    const courseDoc = await db.collection('courses').doc(courseId).get();
+    if (!courseDoc.exists) {
+      alert('Курс не найден');
+      return;
+    }
+    
+    const course = courseDoc.data();
+    showPage('course-view');
+    
+    document.getElementById('course-view-title').textContent = course.title;
+    document.getElementById('course-view-desc').textContent = course.description || '';
+    document.getElementById('course-view-level').textContent = 
+      { beginner: 'Новичок', intermediate: 'Средний', advanced: 'Продвинутый' }[course.level] || course.level;
+    
+    // Загружаем лекции и тесты
+    loadStudentCourseContent(courseId);
+  } catch (error) {
+    console.error('Ошибка загрузки курса:', error);
+    alert('Ошибка при загрузке курса');
+  }
+}
+
+async function loadStudentCourseContent(courseId) {
+  // Загружаем лекции
+  const lecturesContainer = document.getElementById('course-view-lectures');
+  if (lecturesContainer) {
+    const lectures = await db
+      .collection('lectures')
+      .where('courseId', '==', courseId)
+      .orderBy('order', 'asc')
+      .get();
+    
+    lecturesContainer.innerHTML = '';
+    
+    if (lectures.empty) {
+      lecturesContainer.innerHTML = '<p style="color: hsl(215, 20%, 65%);">Нет лекций</p>';
+    } else {
+      lectures.forEach(doc => {
+        const lecture = doc.data();
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.cursor = 'pointer';
+        div.onclick = () => viewLecture(lecture.id);
+        div.innerHTML = `
+          <div class="card-content">
+            <h3 class="card-title">${escapeHtmlAttr(lecture.title)}</h3>
+            <p class="card-text">${escapeHtmlAttr(lecture.description || '')}</p>
+          </div>
+        `;
+        lecturesContainer.appendChild(div);
+      });
+    }
+  }
+  
+  // Загружаем тесты
+  const testsContainer = document.getElementById('course-view-tests');
+  if (testsContainer) {
+    const tests = await db
+      .collection('tests')
+      .where('courseId', '==', courseId)
+      .orderBy('createdAt', 'asc')
+      .get();
+    
+    testsContainer.innerHTML = '';
+    
+    if (tests.empty) {
+      testsContainer.innerHTML = '<p style="color: hsl(215, 20%, 65%);">Нет тестов</p>';
+    } else {
+      tests.forEach(doc => {
+        const test = doc.data();
+        const div = document.createElement('div');
+        div.className = 'card';
+        div.style.cursor = 'pointer';
+        div.onclick = () => startTest(test.id);
+        div.innerHTML = `
+          <div class="card-content">
+            <h3 class="card-title">${escapeHtmlAttr(test.title)}</h3>
+            <p class="card-text">${test.questions?.length || 0} вопросов</p>
+          </div>
+        `;
+        testsContainer.appendChild(div);
+      });
+    }
+  }
+}
+
+async function updateStudentStats() {
+  if (!currentUser || currentUser.role !== 'student') return;
+  
+  try {
+    const progressDoc = await db.collection('studentProgress').doc(currentUser.id).get();
+    const userProgress = progressDoc.exists ? progressDoc.data() : {};
+    
+    let totalTests = 0;
+    let totalCorrectTests = 0;
+    let completedLectures = 0;
+    
+    for (const courseId in userProgress) {
+      const progress = userProgress[courseId];
+      const results = progress.testResults || [];
+      totalTests += results.length;
+      totalCorrectTests += results.filter(r => r && r.score >= 70).length;
+      const completed = progress.completedLectures || {};
+      completedLectures += Object.keys(completed).length;
+    }
+    
+    const successRate = totalTests > 0 ? Math.round((totalCorrectTests / totalTests) * 100) : 0;
+    
+    document.getElementById('total-tests').textContent = totalTests;
+    document.getElementById('correct-tests').textContent = completedLectures;
+    document.getElementById('success-rate').textContent = successRate + '%';
+    
+    const activeContainer = document.getElementById('active-student-courses');
+    const noActiveEl = document.getElementById('no-active-courses');
+    const activeCourses = Object.keys(userProgress).length;
+    
+    if (noActiveEl) {
+      noActiveEl.style.display = activeCourses ? 'none' : 'block';
+    }
+    
+    if (activeContainer && activeCourses > 0) {
+      const courseSnapshot = await db.collection('courses').get();
+      const courses = {};
+      courseSnapshot.docs.forEach(doc => {
+        courses[doc.id] = { id: doc.id, ...doc.data() };
+      });
+      
+      activeContainer.innerHTML = '';
+      
+      for (const courseId of Object.keys(userProgress)) {
+        const course = courses[courseId];
+        if (!course) continue;
+        
+        let categoryIcon = '💻';
+        let categoryName = 'Программирование';
+        switch (course.category) {
+          case 'design':
+            categoryIcon = '🎨';
+            categoryName = 'Дизайн';
+            break;
+          case 'databases':
+            categoryIcon = '📊';
+            categoryName = 'Базы данных';
+            break;
+          default:
+            categoryIcon = '💻';
+            categoryName = 'Программирование';
+        }
+        
+        const levelLabel =
+          course.level === 'beginner' ? 'Новичок' :
+          course.level === 'intermediate' ? 'Популярный' : 'Продвинутый';
+        
+        let durationText = '12 занятий • 4 недели';
+        if (categoryName === 'Дизайн') durationText = '16 занятий • 6 недель';
+        if (categoryName === 'Базы данных') durationText = '20 занятий • 8 недель';
+        
+        const safeId = course.id.replace(/'/g, "\\'");
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cssText = `
+          background: hsl(var(--card));
+          border-radius: 1rem;
+          overflow: hidden;
+          border: 1px solid hsl(var(--border));
+          transition: all 0.3s;
+        `;
+        card.innerHTML = `
+          <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">${categoryIcon}</div>
+            <div style="font-size: 1.1rem; font-weight: 600; color: white;">${categoryName}</div>
+          </div>
+          <div style="padding: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+              <span style="background: ${levelLabel === 'Новичок' ? 'hsl(var(--primary)/0.2)' : levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)/0.2' : 'hsl(var(--primary)/0.2)'}; color: ${levelLabel === 'Новичок' ? 'hsl(var(--primary))' : levelLabel === 'Популярный' ? 'hsl(142, 76%, 37%)' : 'hsl(var(--primary))'}; padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">${levelLabel}</span>
+              <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">${durationText}</span>
+            </div>
+            <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">${escapeHtmlAttr(course.title)}</h3>
+            <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+              ${escapeHtmlAttr(course.description || 'Без описания')}
+            </p>
+            <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">${durationText.split(' • ')[0].replace('занятий', 'lessons')}</div>
+            <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem; box-shadow: 0 0 15px hsl(var(--primary)/0.4);" onclick="viewCourseAsStudent('${safeId}')">
+              Продолжить
+            </button>
+          </div>
+        `;
+        activeContainer.appendChild(card);
+      }
+    }
+    
+    const gradesTable = document.getElementById('grades-table');
+    if (gradesTable) {
+      const allScores = Object.values(userProgress).flatMap(c => c.testResults || []);
+      if (allScores.length === 0) {
+        gradesTable.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem;">Нет оценок</td></tr>';
+      } else {
+        const courseSnapshot = await db.collection('courses').get();
+        const courses = {};
+        courseSnapshot.docs.forEach(doc => {
+          courses[doc.id] = { id: doc.id, ...doc.data() };
+        });
+        
+        gradesTable.innerHTML = '';
+        for (const courseId in userProgress) {
+          const course = courses[courseId];
+          const results = userProgress[courseId].testResults || [];
+          results.forEach(r => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${course ? escapeHtmlAttr(course.title) : 'Неизвестный курс'}</td>
+              <td>Тест</td>
+              <td>${escapeHtmlAttr(r.testName)}</td>
+              <td>${r.score}%</td>
+              <td>${r.date}</td>
+            `;
+            gradesTable.appendChild(row);
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Ошибка обновления статистики:', error);
+  }
+}
+
+// Обработчик отправки сообщений
+document.getElementById('contact-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const name = document.getElementById('name')?.value.trim();
+  const email = document.getElementById('email')?.value.trim();
+  const message = document.getElementById('message')?.value.trim();
+  
+  if (!name || !email || !message) {
+    alert('Пожалуйста, заполните все поля');
+    return;
+  }
+  
+  try {
+    // Сохраняем сообщение в Firestore
+    await db.collection('messages').add({
+      name,
+      email,
+      message,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+      status: 'new' // статус: новое, прочитано, отвечено
+    });
+    
+    // Очищаем форму
+    this.reset();
+    
+    // Показываем уведомление
+    alert('✅ Ваше сообщение отправлено! Мы ответим вам в ближайшее время.');
+    
+    // Логируем в консоль для админа
+    console.log('Новое сообщение от:', name, email);
+    
+  } catch (error) {
+    console.error('Ошибка отправки сообщения:', error);
+    alert('❌ Не удалось отправить сообщение. Попробуйте позже.');
+  }
+});
+
+async function loadMessages() {
+  const snapshot = await db.collection('messages')
+    .orderBy('timestamp', 'desc')
+    .get();
+  
+  const container = document.getElementById('messages-container');
+  container.innerHTML = '';
+  
+  snapshot.forEach(doc => {
+    const msg = doc.data();
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+        <strong>${escapeHtmlAttr(msg.name)}</strong>
+        <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">
+          ${msg.timestamp?.toDate().toLocaleString('ru-RU')}
+        </span>
+      </div>
+      <div style="margin-bottom: 0.5rem;">
+        <strong>Email:</strong> ${escapeHtmlAttr(msg.email)}
+      </div>
+      <p style="margin-bottom: 1rem;">${escapeHtmlAttr(msg.message)}</p>
+      <div style="display: flex; gap: 0.5rem;">
+        <button class="btn btn-outline" onclick="markMessageRead('${doc.id}')">✓ Прочитано</button>
+        <button class="btn btn-primary" onclick="replyToMessage('${doc.id}')">✉️ Ответить</button>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+// Обработчик поисковой строки
+document.getElementById('search-input')?.addEventListener('input', function(e) {
+  currentSearchQuery = e.target.value.trim().toLowerCase();
+  loadCoursesCatalog();
+});
+
+// Обработчик кнопок категорий
+document.querySelectorAll('.category-btn').forEach(button => {
+  button.addEventListener('click', function() {
+    // Снимаем активный класс со всех кнопок
+    document.querySelectorAll('.category-btn').forEach(btn => {
+      btn.classList.remove('active');
+    });
+    
+    // Добавляем активный класс к текущей кнопке
+    this.classList.add('active');
+    
+    // Устанавливаем текущую категорию
+    currentCategory = this.getAttribute('data-category') || '';
+    loadCoursesCatalog();
+  });
+});
+
+// Функция обновления имени пользователя в интерфейсе
+function updateUserName() {
+  const userNameEl = document.getElementById('user-name');
+  if (!userNameEl) return;
+  
+  if (currentUser && currentUser.name) {
+    userNameEl.textContent = currentUser.name;
+  } else {
+    userNameEl.textContent = 'Гость';
+  }
+}
+
+async function login() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  
+  try {
+    const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    // Загружаем данные пользователя из Firestore
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    
+    if (userDoc.exists) {
+      const userData = userDoc.data();
+      currentUser = {
+        id: user.uid,
+        email: user.email,
+        name: userData.name || user.displayName || user.email.split('@')[0], // ← Имя пользователя
+        role: userData.role || 'student'
+      };
+      
+      updateAuthUI();
+      showPage('home');
+    } else {
+      alert('Пользователь не найден в базе данных');
+    }
+  } catch (error) {
+    console.error('Ошибка входа:', error);
+    alert('Ошибка входа: ' + error.message);
+  }
+}
+
+async function register() {
+  const email = document.getElementById('register-email').value;
+  const password = document.getElementById('register-password').value;
+  const name = document.getElementById('register-name')?.value || email.split('@')[0];
+  const role = document.querySelector('input[name="role"]:checked')?.value || 'student';
+  
+  try {
+    const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+    
+    // Сохраняем данные пользователя в Firestore
+    await db.collection('users').doc(user.uid).set({
+      email: user.email,
+      name: name, // ← Имя пользователя
+      role: role
+    });
+    
+    currentUser = {
+      id: user.uid,
+      email: user.email,
+      name: name, // ← Имя пользователя
+      role: role
+    };
+    
+    updateAuthUI();
+    showPage('home');
+  } catch (error) {
+    console.error('Ошибка регистрации:', error);
+    alert('Ошибка регистрации: ' + error.message);
+  }
+}
+
+function showEditProfileForm() {
+  const form = document.getElementById('edit-profile-form');
+  if (form) {
+    form.style.display = 'block';
+    
+    // Заполняем поля текущими данными
+    document.getElementById('profile-name').value = currentUser.name || '';
+    document.getElementById('profile-email').value = currentUser.email || '';
+    
+    // Скрываем меню
+    document.getElementById('user-dropdown').style.display = 'none';
+  }
+}
+
+function hideEditProfileForm() {
+  const form = document.getElementById('edit-profile-form');
+  if (form) {
+    form.style.display = 'none';
+  }
+}
+
+document.getElementById('profile-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const name = document.getElementById('profile-name').value.trim();
+  const email = document.getElementById('profile-email').value.trim();
+  
+  if (!name || !email) {
+    alert('Пожалуйста, заполните все поля');
+    return;
+  }
+  
+  try {
+    const userDocRef = db.collection('users').doc(currentUser.id);
+    const userDoc = await userDocRef.get();
+    
+    // Если документ не существует — создаём его
+    if (!userDoc.exists) {
+      await userDocRef.set({
+        name: name,
+        email: email,
+        role: currentUser.role || 'student',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } else {
+      // Если документ существует — обновляем его
+      await userDocRef.update({
+        name: name,
+        email: email
+      });
+    }
+    
+    // Обновляем локальные данные
+    currentUser.name = name;
+    currentUser.email = email;
+    
+    // Обновляем интерфейс
+    updateAuthUI();
+    updateWelcomeMessage();
+    
+    alert('✅ Профиль успешно обновлен!');
+    hideEditProfileForm();
+  } catch (error) {
+    console.error('❌ Ошибка при обновлении профиля:', error);
+    alert('❌ Не удалось обновить профиль. Попробуйте позже.');
+  }
+});
+
+function updateWelcomeMessage() {
+  const welcomeName = document.getElementById('welcome-name');
+  const welcomeNameInitial = document.getElementById('welcome-name-initial');
+  
+  if (welcomeName) {
+    if (currentUser && currentUser.name) {
+      welcomeName.textContent = `С возвращением, ${currentUser.name}!`;
+    } else {
+      welcomeName.textContent = 'С возвращением!';
+    }
+  }
+  if (welcomeNameInitial) {
+    if (currentUser && currentUser.name) {
+      welcomeNameInitial.textContent = currentUser.name.charAt(0).toUpperCase();
+    } else {
+      welcomeNameInitial.textContent = 'M';
+    }
+  }
+}
+
+// Предпросмотр выбранного файла
+// Глобальная переменная для хранения URL загруженного файла
+let uploadedFileUrl = null;
+
+// Обработчик загрузки файла
+
+
+// Измените обработчик формы лекции
+document.getElementById('lecture-form')?.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const courseId = document.getElementById('lecture-course-id').value;
+  const title = document.getElementById('lecture-title').value;
+  const content = document.getElementById('lecture-content').value;
+  const fileInput = document.getElementById('lecture-file');
+  const file = fileInput.files[0];
+  
+  try {
+    let fileData = null;
+    
+    // Если есть файл для загрузки
+    if (file) {
+      const lectureId = editingLectureDocId || db.collection(`courses/${courseId}/lectures`).doc().id;
+      fileData = await uploadLectureFile(file, courseId, lectureId);
+    }
+    
+    if (editingLectureDocId) {
+      // Обновление существующей лекции
+      const updateData = { title, content };
+      if (fileData) {
+        updateData.fileUrl = fileData.url;
+        updateData.fileName = fileData.name;
+        updateData.fileSize = fileData.size;
+      }
+      await db.collection(`courses/${courseId}/lectures`).doc(editingLectureDocId).update(updateData);
+      alert('✅ Лекция обновлена!');
+    } else {
+      // Создание новой лекции
+      const lectureData = { 
+        title, 
+        content, 
+        order: Date.now() 
+      };
+      if (fileData) {
+        lectureData.fileUrl = fileData.url;
+        lectureData.fileName = fileData.name;
+        lectureData.fileSize = fileData.size;
+      }
+      await db.collection(`courses/${courseId}/lectures`).add(lectureData);
+      alert('✅ Лекция добавлена!');
+    }
+    
+    editingLectureDocId = null;
+    const submitBtn = document.querySelector('#lecture-form button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Сохранить лекцию';
+    
+    // Очистка формы
+    fileInput.value = '';
+    document.getElementById('file-preview').style.display = 'none';
+    
+    hideAddLectureForm();
+  } catch (error) {
+    console.error('Ошибка при сохранении лекции:', error);
+    alert('❌ Не удалось сохранить лекцию. Попробуйте позже.');
+  }
+});
+
+// Удаление файла лекции
+async function deleteLectureFile(courseId, lectureId) {
+  if (!confirm('Вы уверены, что хотите удалить файл?')) return;
+  
+  try {
+    // Получаем информацию о файле
+    const lectureDoc = await db.collection(`courses/${courseId}/lectures`).doc(lectureId).get();
+    const lecture = lectureDoc.data();
+    
+    if (lecture.fileUrl) {
+      // Удаляем из Storage
+      const storage = firebase.storage();
+      const fileRef = storage.refFromURL(lecture.fileUrl);
+      await fileRef.delete();
+    }
+    
+    // Удаляем информацию из Firestore
+    await db.collection(`courses/${courseId}/lectures`).doc(lectureId).update({
+      fileUrl: firebase.firestore.FieldValue.delete(),
+      fileName: firebase.firestore.FieldValue.delete(),
+      fileSize: firebase.firestore.FieldValue.delete()
+    });
+    
+    alert('✅ Файл удалён!');
+    viewCourse(courseId); // Обновляем отображение
+  } catch (error) {
+    console.error('Ошибка удаления файла:', error);
+    alert('❌ Не удалось удалить файл: ' + error.message);
+  }
+}
+
+// Скачивание файла
+function downloadFile(url, fileName) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+</script>
+</body>
+</html>
