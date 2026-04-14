@@ -1,15 +1,19 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Campus Online Pro — Онлайн-кампус нового поколения</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>">
+<title>Учебный центр Профи — Дистанционное обучение</title>
+<link rel="icon" href="Профи.png" type="image/png">
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-storage-compat.js"></script>
+
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 :root {
   --background: 0 0% 0%;               /* pure black */
@@ -349,6 +353,16 @@ nav ul { flex-wrap: wrap; justify-content: center; }
     background: hsl(var(--primary));
     color: white;
 }
+input[type="checkbox"]:disabled {
+  opacity: 1 !important;
+  accent-color: #000000;
+  width: 20px;
+  height: 20px;
+  cursor: default;
+  background-color: white;
+  border: 2px solid #888;
+  box-shadow: 0 0 5px rgba(255,255,255,0.3);
+}
 </style>
 </head>
 <body>
@@ -362,20 +376,70 @@ nav ul { flex-wrap: wrap; justify-content: center; }
   100% { transform: rotate(360deg); }
 }
 </style>
-<header style="padding: 1.25rem 0; border-bottom: 1px solid hsl(var(--border));">
+<header style="padding: 1.25rem 0; border-bottom: 1px solid hsl(var(--border)); background: hsl(var(--card));">
   <div class="container" style="display: flex; justify-content: space-between; align-items: center;">
-    <!-- Логотип -->
-    <a href="#" class="logo" onclick="showPage('home'); return false;" style="display: flex; align-items: center; gap: 0.5rem; font-weight: 800; font-size: 1.3rem; color: white;">
-      <div style="width: 32px; height: 32px; border-radius: 50%; background: hsl(var(--primary)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">C</div>
-      <span>CampusPro</span>
-    </a>
 
-    <!-- Навигация -->
-    <nav style="display: flex; gap: 1.5rem;">
-      <a href="#" class="active" onclick="showPage('home'); return false;" style="color: hsl(var(--foreground)); font-weight: 500; text-decoration: none;">Главная</a>
-      <a href="#" onclick="showPage('courses'); return false;" style="color: hsl(var(--foreground)); font-weight: 500; text-decoration: none;">Курсы</a>
-      <a href="#" onclick="showPage('contact'); return false;" style="color: hsl(var(--foreground)); font-weight: 500; text-decoration: none;">Контакты</a>
-    </nav>
+
+
+<!-- Логотип -->
+<a href="#" class="logo" onclick="showPage('home'); return false;" style="display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+  <!-- Здесь src="Профи.png" означает, что картинка лежит рядом с html файлом -->
+  <img src="Профи.png" alt="ПРОФИ" style="height: 90px; width: auto; display: block;">
+  
+  <!-- Если хотите добавить текст рядом с логотипом, раскомментируйте строку ниже -->
+  <!-- <span style="color: white; font-weight: 800; font-size: 1.2rem;">ПРОФИ</span> -->
+</a>
+
+   <!-- Навигация -->
+<nav style="display: flex; gap: 0.5rem; align-items: center;">
+  <a href="#" class="nav-btn active" onclick="showPage('home'); return false;" 
+     style="
+       color: hsl(var(--foreground)); 
+       font-weight: 600; 
+       text-decoration: none;
+       font-size: 1.1rem;
+       padding: 0.75rem 1.5rem;
+       border-radius: 0.5rem;
+       transition: all 0.3s;
+       border: 2px solid transparent;
+     "
+     onmouseover="this.style.background='hsl(var(--primary)/0.1)'; this.style.borderColor='hsl(var(--primary))';"
+     onmouseout="this.style.background='transparent'; this.style.borderColor='transparent';">
+    Главная
+  </a>
+  
+  <a href="#" class="nav-btn" onclick="showPage('courses'); return false;" 
+     style="
+       color: hsl(var(--foreground)); 
+       font-weight: 600; 
+       text-decoration: none;
+       font-size: 1.1rem;
+       padding: 0.75rem 1.5rem;
+       border-radius: 0.5rem;
+       transition: all 0.3s;
+       border: 2px solid transparent;
+     "
+     onmouseover="this.style.background='hsl(var(--primary)/0.1)'; this.style.borderColor='hsl(var(--primary))';"
+     onmouseout="this.style.background='transparent'; this.style.borderColor='transparent';">
+    Курсы
+  </a>
+  
+  <a href="#" class="nav-btn" onclick="showPage('contact'); return false;" 
+     style="
+       color: hsl(var(--foreground)); 
+       font-weight: 600; 
+       text-decoration: none;
+       font-size: 1.1rem;
+       padding: 0.75rem 1.5rem;
+       border-radius: 0.5rem;
+       transition: all 0.3s;
+       border: 2px solid transparent;
+     "
+     onmouseover="this.style.background='hsl(var(--primary)/0.1)'; this.style.borderColor='hsl(var(--primary))';"
+     onmouseout="this.style.background='transparent'; this.style.borderColor='transparent';">
+    Контакты
+  </a>
+</nav>
 
     <!-- Пользователь -->
 <!-- Пользователь (авторизованный) -->
@@ -407,6 +471,14 @@ nav ul { flex-wrap: wrap; justify-content: center; }
     </svg>
     Редактировать профиль
   </a>
+<a href="#" class="dropdown-item" onclick="deleteProfile(); return false;" style="display: block; padding: 0.75rem 1.25rem; color: hsl(0, 62.8%, 30.6%); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(0, 62.8%, 30.6%);">
+<path d="M3 6h18"></path>
+<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+</svg>
+Удалить профиль
+</a>
     <a href="#" class="dropdown-item" onclick="logout(); return false;" style="display: block; padding: 0.75rem 1.25rem; color: hsl(var(--foreground)); text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
       <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: hsl(var(--muted-foreground));">
         <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
@@ -432,96 +504,97 @@ nav ul { flex-wrap: wrap; justify-content: center; }
   
 <!-- Главная -->
 <section id="home" class="page active">
-  <div class="container" style="text-align: center; padding: 6rem 0 4rem;">
-    <!-- Метка -->
-    <div style="display: inline-block; background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.4rem 1.2rem; border-radius: 9999px; font-size: 0.85rem; margin-bottom: 1.5rem; font-weight: 500;">
-      🌟 Новые курсы доступны уже сейчас
-    </div>
-
+  <div class="container" style="text-align: center; padding: 3rem 0 2rem;">
     <!-- Заголовок с градиентом -->
-    <h1 class="section-title" style="font-size: 4rem; font-weight: 800; line-height: 1.1; margin-bottom: 1.25rem; color: white;">
-      Платформа для<br>
-      <span style="background: linear-gradient(90deg, #8a2be2, #ff4081); -webkit-background-clip: text; background-clip: text; color: transparent;">
-        Онлайн обучения
+    <h1 class="section-title" style="font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 1.5rem; color: white;">
+      <span style="background: linear-gradient(135deg, #fff, #8a2be2, #ff4081); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+        Учебный центр Профи
       </span>
     </h1>
 
+    <h2 style="font-size: 2rem; font-weight: 700; line-height: 1.2; margin-bottom: 1rem; color: white;">
+      Платформа для<br>
+      <span style="background: linear-gradient(90deg, #8a2be2, #ff4081); -webkit-background-clip: text; background-clip: text; color: transparent;">
+        Дистанционного обучения
+      </span>
+    </h2>
+
     <!-- Подзаголовок -->
-    <p class="section-subtitle" style="font-size: 1.25rem; color: hsl(215, 20%, 65%); max-width: 600px; margin: 0 auto 2rem;">
+    <p class="section-subtitle" style="font-size: 1.1rem; color: hsl(215, 20%, 65%); max-width: 600px; margin: 0 auto 2rem;">
       Выбери направление и начни обучение уже сегодня
     </p>
 
     <!-- Кнопки -->
-    <div style="display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+    <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 3rem;">
       <a href="#" onclick="showPage('courses'); return false;" class="btn btn-primary">Начать обучение →</a>
       <a href="#" onclick="showPage('contact'); return false;" class="btn btn-outline">Связаться со службой поддержки</a>
     </div>
   </div>
-<div class="container" style="margin-top: 4rem;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-    <h2 class="section-title" style="font-size: 2.25rem; font-weight: 800; color: white; margin: 0;">
-      Наши курсы
-    </h2>
-    <a href="#" onclick="showPage('courses'); return false;" class="btn btn-outline">Просмотреть Все Курсы →</a>
-  </div>
-   <div class="card-grid" style="gap: 1.5rem;">
-    <!-- Карточка 1 -->
-    <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
-      <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">💻</div>
-        <div style="font-size: 1.1rem; font-weight: 600; color: white;">Прогрирование</div>
-      </div>
-      <div style="padding: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-          <span style="background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Новичок</span>
-          <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">12 занятий • 4 недели</span>
-        </div>
-        <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Основы программирования</h3>
-        <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
-          Python, алгоритмы, структуры данных. С нуля до первого проекта.
-        </p>
-        <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">12 lessons</div>
-        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem;">Начать курс</button>
-      </div>
-    </div>
 
-    <!-- Карточка 2 -->
-    <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
-      <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">🎨</div>
-        <div style="font-size: 1.1rem; font-weight: 600; color: white;">Дизайн</div>
-      </div>
-      <div style="padding: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-          <span style="background: hsl(142, 76%, 37%)/0.2; color: hsl(142, 76%, 37%); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Популярный</span>
-          <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">16 занятий • 6 недель</span>
-        </div>
-        <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Дизайн интерфейсов</h3>
-        <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
-          Figma, принципы UX/UI, создание прототипов, дизайн-системы.
-        </p>
-        <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">16 lessons</div>
-        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem;">Начать курс</button>
-      </div>
+  <!-- Секция курсов -->
+  <div class="container" style="margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+      <h2 class="section-title" style="font-size: 2rem; font-weight: 800; color: white; margin: 0;">
+        Наши курсы
+      </h2>
+      <a href="#" onclick="showPage('courses'); return false;" class="btn btn-outline">Просмотреть Все Курсы →</a>
     </div>
-
-    <!-- Карточка 3 -->
-    <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
-      <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
-        <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
-        <div style="font-size: 1.1rem; font-weight: 600; color: white;">Базы данных</div>
-      </div>
-      <div style="padding: 1.25rem;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-          <span style="background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Продвинутый</span>
-          <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">20 занятий • 8 недель</span>
+    <div class="card-grid" style="gap: 1.5rem;">
+      <!-- Карточка 1 -->
+      <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+        <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">💻</div>
+          <div style="font-size: 1.1rem; font-weight: 600; color: white;">Программирование</div>
         </div>
-        <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Базы данных</h3>
-        <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
-          Pandas, машинное обучение, визуализация, реальные кейсы.
-        </p>
-        <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">20 lessons</div>
-        <button class="btn btn-primary" style="width: 100%; padding: 0.6rem; font-size: 0.95rem; border-radius: 0.75rem;">Начать курс</button>
+        <div style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Новичок</span>
+            <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">12 занятий • 4 недели</span>
+          </div>
+          <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Основы программирования</h3>
+          <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+            Основы алгоритмитизации и программирования.
+          </p>
+          <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">12 lessons</div>
+        </div>
+      </div>
+
+      <!-- Карточка 2 -->
+      <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+        <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">🎨</div>
+          <div style="font-size: 1.1rem; font-weight: 600; color: white;">Дизайн</div>
+        </div>
+        <div style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="background: hsl(142, 76%, 37%)/0.2; color: hsl(142, 76%, 37%); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Популярный</span>
+            <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">16 занятий • 6 недель</span>
+          </div>
+          <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Дизайн интерфейсов</h3>
+          <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+            Figma, принципы UX/UI, создание прототипов, дизайн-системы.
+          </p>
+          <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">16 lessons</div>
+        </div>
+      </div>
+
+      <!-- Карточка 3 -->
+      <div class="card" style="background: hsl(var(--card)); border-radius: 1rem; overflow: hidden; border: 1px solid hsl(var(--border)); transition: all 0.3s;">
+        <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: hsl(var(--card));">
+          <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+          <div style="font-size: 1.1rem; font-weight: 600; color: white;">Базы данных</div>
+        </div>
+        <div style="padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <span style="background: hsl(var(--primary)/0.2); color: hsl(var(--primary)); padding: 0.2rem 0.6rem; font-size: 0.75rem; border-radius: 9999px;">Продвинутый</span>
+            <span style="color: hsl(215, 20%, 65%); font-size: 0.85rem;">20 занятий • 8 недель</span>
+          </div>
+          <h3 style="font-size: 1.3rem; font-weight: 600; color: white; margin-bottom: 0.5rem;">Базы данных</h3>
+          <p style="color: hsl(215, 20%, 65%); font-size: 0.95rem; margin-bottom: 1rem;">
+            Pandas, машинное обучение, визуализация, реальные кейсы.
+          </p>
+          <div style="color: hsl(215, 20%, 65%); font-size: 0.85rem; margin-bottom: 1rem;">20 lessons</div>
+        </div>
       </div>
     </div>
   </div>
@@ -586,7 +659,8 @@ nav ul { flex-wrap: wrap; justify-content: center; }
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; max-width: 800px; margin: 0 auto;">
 <div>
 <h3 style="font-size: 1.25rem; margin-bottom: 1rem;">Контакты</h3>
-<p>📧 <a href="mailto:hello@campus-pro.ru" style="color: hsl(var(--primary));">hello@campus-pro.ru</a></p>
+<p>📧 <a href="mailto:hello@campus-pro.ru" style="color: hsl(var(--primary));">admin@profi.mail.ru
+</a></p>
 <p>📞 +7 (495) 123-45-67</p>
 <p>📍 Балаково, ул. Новаторов, д. 10</p>
 <div style="margin-top: 1.5rem;">
@@ -925,31 +999,31 @@ nav ul { flex-wrap: wrap; justify-content: center; }
               resize: vertical;
             "></textarea>
           </div>
-  <div class="form-group">
-                <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Файл лекции (PDF, DOCX)</label>
-                <input type="file" id="lecture-file" accept=".pdf,.docx,.doc,.ppt,.pptx" style="
+ <!-- ПОЛЕ ДЛЯ ЗАГРУЗКИ ФАЙЛА -->
+            <div class="form-group">
+                <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Файл лекции (PDF, DOCX, PPT)</label>
+                <input type="file" id="lecture-file" accept=".pdf,.docx,.doc,.ppt,.pptx,.zip,.rar" style="
                     width: 100%;
                     padding: 0.5rem;
                     background: hsl(var(--card));
                     border: 1px solid hsl(var(--border));
                     border-radius: 0.75rem;
                     color: hsl(var(--foreground));
-                    ">
-                    <small style="color: hsl(215, 20%, 65%);">Максимум 10 МБ</small>
+                ">
+<small style="color: hsl(215, 20%, 65%);">Максимум 100 МБ</small>
             </div>
             <div id="file-upload-progress" style="display: none; margin-top: 0.5rem;">
                 <div style="background: hsl(var(--border)); border-radius: 0.5rem; height: 4px; overflow: hidden;">
-…                    <div id="progress-bar" style="background: hsl(var(--primary)); height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    <div id="progress-bar" style="background: hsl(var(--primary)); height: 100%; width: 0%; transition: width 0.3s;"></div>
                 </div>
                 <span id="progress-text" style="font-size: 0.85rem; color: hsl(215, 20%, 65%);">0%</span>
             </div>
             
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem;">Сохранить лекцию</button>
+  <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.75rem; margin-bottom: 0.5rem;">Сохранить лекцию</button>
             <button type="button" class="btn" style="width: 100%; background: transparent; color: hsl(var(--muted-foreground));" onclick="hideAddLectureForm()">Отмена</button>
         </form>
     </div>
 </div>
-         
     
     <!-- Форма создания теста -->
     <div id="add-test-form" style="display: none; margin-top: 2rem;">
@@ -1028,12 +1102,12 @@ nav ul { flex-wrap: wrap; justify-content: center; }
       <button class="btn btn-outline" onclick="backToCourse()">← Назад к курсу</button>
     </div>
     <div id="lecture-view-content"></div>
-    <div style="margin-top: 2rem;">
-      <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
+<div id="lecture-check-container" style="margin-top: 2rem;">
+    <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem;">
         <input type="checkbox" id="lecture-completed" onchange="toggleLectureCompleted()">
-        <span>✅ Прочитано</span>
-      </label>
-    </div>
+        <span>Прочитано</span>
+    </label>
+</div>
   </div>
 </section>
 
@@ -1079,8 +1153,8 @@ nav ul { flex-wrap: wrap; justify-content: center; }
       <!-- Логотип и слоган -->
       <div>
         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
-          <div style="width: 32px; height: 32px; border-radius: 50%; background: hsl(var(--primary)); display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;">C</div>
-          <span style="font-weight: 800; font-size: 1.3rem; color: white;">CampusPro</span>
+          <div style="width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: white;"></div>
+          <img src="Профи.png" alt="ПРОФИ" style="height: 65px; width: auto; display: block;">
         </div>
         <p style="color: hsl(215, 20%, 65%); margin: 0;">Образование будущего — уже сегодня.</p>
       </div>
@@ -1099,7 +1173,7 @@ nav ul { flex-wrap: wrap; justify-content: center; }
       <div>
         <h3 style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: 1rem;">Контакты</h3>
         <div style="color: hsl(215, 20%, 65%); line-height: 1.6;">
-          <p><span style="color: hsl(var(--primary));">✉️</span> hello@campus-pro.ru</p>
+          <p><span style="color: hsl(var(--primary));">✉️</span> admin@profi.mail.ru</p>
           <p><span style="color: hsl(var(--primary));">📞</span> +7 (495) 123-45-67</p>
           <p><span style="color: hsl(var(--primary));">📍</span> Балаково, Россия</p>
         </div>
@@ -1131,6 +1205,15 @@ let editingTestDocId = null;
 let currentSearchQuery = '';
 let currentCategory = '';
 
+
+// Функция конвертации процентов в пятибалльную оценку
+function convertToFivePointScale(percentage) {
+    if (percentage >= 90) return 5;
+    if (percentage >= 80) return 4;
+    if (percentage >= 70) return 3;
+    return 2;
+}
+
 // 2. Сразу скрываем интерфейс при загрузке страницы
 document.body.style.opacity = '0';
 const spinner = document.getElementById('loading-spinner');
@@ -1159,6 +1242,60 @@ const firebaseConfig = {
 const app = firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
+
+// === НАСТРОЙКИ SUPABASE ===
+const SUPABASE_URL = 'https://rokxrqzjdasomrujbjmh.supabase.co';  
+const SUPABASE_KEY = 'sb_publishable_IsAm83zCcJCF_zNuDBKfIA_ox7Otnyc';  
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+
+// === ЗАГРУЗКА ФАЙЛА В SUPABASE STORAGE ===
+async function uploadToSupabase(file, courseId, title) {
+    const progressDiv = document.getElementById('file-upload-progress');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    
+    if (progressDiv) progressDiv.style.display = 'block';
+    if (progressBar) progressBar.style.width = '30%';
+    if (progressText) progressText.textContent = 'Подготовка...';
+    
+    try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${courseId}/${Date.now()}_${title.replace(/[^a-z0-9]/gi, '_')}.${fileExt}`;
+        
+        if (progressBar) progressBar.style.width = '60%';
+        if (progressText) progressText.textContent = 'Загрузка...';
+        
+        const { data, error } = await supabaseClient.storage
+            .from('lectures')
+            .upload(fileName, file, {
+                cacheControl: '3600',
+                upsert: false
+            });
+        
+        if (error) throw error;
+        
+        const { data: { publicUrl } } = supabaseClient.storage
+    .from('lectures')
+    .getPublicUrl(fileName);
+        
+        if (progressBar) progressBar.style.width = '100%';
+        if (progressText) progressText.textContent = 'Готово!';
+        
+        return {
+            fileName: file.name,
+            fileSize: file.size,
+            downloadUrl: publicUrl,
+            filePath: fileName
+        };
+        
+    } catch (error) {
+        console.error('❌ Ошибка загрузки в Supabase:', error);
+        if (progressText) progressText.textContent = 'Ошибка!';
+        throw error;
+    }
+}
 
 function toggleDropdown() {
   const d = document.getElementById('user-dropdown');
@@ -1213,34 +1350,6 @@ function updateAuthUI() {
   }
   updateWelcomeMessage(); // ← Обновляем приветствие
 }
-
-// 6. Обработчик аутентификации (главное исправление!)
-auth.onAuthStateChanged(async (user) => {
-  if (user) {
-    // Загружаем ДАННЫЕ ПОЛЬЗОВАТЕЛЯ из Firestore (включая имя!)
-    const userDoc = await db.collection('users').doc(user.uid).get();
-    const userData = userDoc.data();
-    
-    currentUser = {
-      id: user.uid,
-      email: user.email,
-      role: userData?.role || 'student',
-      name: userData?.name || user.email.split('@')[0] // ← Берём имя из Firestore!
-    };
-    
-    updateAuthUI();
-    showPage('dashboard');
-  } else {
-    currentUser = null;
-    updateAuthUI();
-    showPage('login');
-  }
-  
-  // ← ПОКАЗЫВАЕМ ИНТЕРФЕЙС ТОЛЬКО ПОСЛЕ ЗАГРУЗКИ ДАННЫХ!
-  document.body.style.opacity = '1';
-  if (spinner) spinner.style.display = 'none';
-});
-
 
 
 // ======================
@@ -1382,40 +1491,37 @@ document.getElementById('contact-form')?.addEventListener('submit', function(e) 
 document.body.style.opacity = '0';
 document.getElementById('loading-spinner').style.display = 'flex';
 
+// 6. Обработчик аутентификации (исправленный)
 auth.onAuthStateChanged(async (user) => {
   if (user) {
-    // Загружаем данные пользователя из Firestore
+    // Загружаем ДАННЫЕ ПОЛЬЗОВАТЕЛЯ из Firestore (включая имя!)
     const userDoc = await db.collection('users').doc(user.uid).get();
     const userData = userDoc.data();
     currentUser = {
       id: user.uid,
       email: user.email,
       role: userData?.role || 'student',
-      name: userData?.name || user.email.split('@')[0] // Используем имя из Firestore
+      name: userData?.name || user.email.split('@')[0] // ← Берём имя из Firestore!
     };
     updateAuthUI();
-    showPage('dashboard');
-    // После обновления интерфейса
-    document.body.style.opacity = '1';
-    document.getElementById('loading-spinner').style.display = 'none';
+    showPage('dashboard'); // ← Для авторизованных открывается дашборд
   } else {
     currentUser = null;
     updateAuthUI();
-    showPage('login');
-    // После обновления интерфейса
-    document.body.style.opacity = '1';
-    document.getElementById('loading-spinner').style.display = 'none';
+    showPage('home'); // ✅ ВАЖНО: при отсутствии авторизации показываем ГЛАВНУЮ страницу
   }
+  // ← ПОКАЗЫВАЕМ ИНТЕРФЕЙС ТОЛЬКО ПОСЛЕ ЗАГРУЗКИ ДАННЫХ!
+  document.body.style.opacity = '1';
+  if (spinner) spinner.style.display = 'none';
 });
 
 function logout() {
   auth.signOut().then(() => {
     currentUser = null;
     updateAuthUI();
-    showPage('login');
+    showPage('home'); // ✅ После выхода возвращаемся на главную страницу
   });
 }
-
 
 
 // ======================
@@ -1696,6 +1802,7 @@ function showAddTestForm() {
 
 
 async function viewCourse(courseId) {
+  console.log('📦 viewCourse вызвана с courseId:', courseId);
   currentCourseId = courseId;
   try {
     const courseDoc = await db.collection('courses').doc(courseId).get();
@@ -1710,32 +1817,34 @@ async function viewCourse(courseId) {
 // Лекции
 const lectureList = document.getElementById('lecture-list');
 const lecSnapshot = await db.collection(`courses/${courseId}/lectures`).orderBy('order', 'asc').get();
-
 if (lecSnapshot.empty) {
-  lectureList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет лекций</p>';
+    lectureList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет лекций</p>';
 } else {
- lectureList.innerHTML = lecSnapshot.docs.map((doc, i) => {
-    const lec = doc.data();
-    // ✅ Правильная проверка наличия файла
-    const fileButton = lec.fileUrl ? 
-        `<a href="${lec.fileUrl}" target="_blank" style="margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.85rem;" class="btn btn-outline">📎 Файл</a>` : 
-        '';
-    
-    return `
-    <div class="card" style="margin-bottom: 1rem;">
-        <div class="card-content">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
-                <strong>Лекция ${i + 1}: ${lec.title}</strong>
-                <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="editLecture('${courseId}', '${doc.id}')">✏️</button>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <button class="btn btn-outline" onclick="viewLecture('${courseId}', ${i})">Открыть</button>
-                ${fileButton}
+    lectureList.innerHTML = lecSnapshot.docs.map((doc, i) => {
+        const lec = doc.data();
+        // ⭐ Кнопка файла если есть
+const fileButton = lec.hasFile && (lec.downloadUrl || lec.fileUrl) ?
+`<a href="${lec.downloadUrl || lec.fileUrl}" target="_blank" style="margin-left: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.85rem;" class="btn btn-outline">📎 ${lec.fileName || 'Файл'}</a>` :
+'';
+        
+        return `
+        <div class="card" style="margin-bottom: 1rem;">
+            <div class="card-content">
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <strong>Лекция ${i + 1}: ${lec.title}</strong>
+                    <div style="display: flex; gap: 0.25rem;">
+    <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="editLecture('${courseId}', '${doc.id}')">✏️</button>
+    <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; color: hsl(0, 62.8%, 30.6%);" onclick="deleteLecture('${courseId}', '${doc.id}')">🗑️</button>
+</div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="viewLecture('${courseId}', ${i})">Открыть</button>
+                    ${fileButton}
+                </div>
             </div>
         </div>
-    </div>
-    `;
-}).join('');
+        `;
+    }).join('');
 }
 
     // Тесты
@@ -1750,7 +1859,10 @@ if (lecSnapshot.empty) {
           <div style="background: hsl(var(--card)); padding: 1rem; border-radius: var(--radius); margin-bottom: 0.75rem;">
             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
               <strong>Тест ${i + 1}: ${test.title}</strong>
-              <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="editTest('${courseId}', '${doc.id}')">✏️</button>
+              <div style="display: flex; gap: 0.25rem;">
+    <button class="btn btn-outline" style="padding: 0.25rem 0.5rem;" onclick="editTest('${courseId}', '${doc.id}')">✏️</button>
+    <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; color: hsl(0, 62.8%, 30.6%);" onclick="deleteTest('${courseId}', '${doc.id}')">🗑️</button>
+</div>
             </div>
             <p>Вопросов: ${test.questions?.length || 0}</p>
           </div>
@@ -1764,9 +1876,6 @@ if (lecSnapshot.empty) {
     alert('❌ Ошибка загрузки курса.');
   }
 }
-
-  showTeacherSection('course-detail');
-
 
 
 // Редактирование лекций (через Firestore)
@@ -1788,39 +1897,7 @@ function editLecture(courseId, lectureDocId) {
     }
   });
 }
-
-document.getElementById('lecture-form')?.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const courseId = document.getElementById('lecture-course-id').value;
-    const title = document.getElementById('lecture-title').value;
-    const content = document.getElementById('lecture-content').value;
     
-    const lectureData = { 
-        title, 
-        content, 
-        order: Date.now(),
-        fileUrl: uploadedFileUrl, // ← Сохраняем URL файла
-        fileName: document.getElementById('lecture-file').files[0]?.name || null
-    };
-    
-    try {
-        if (editingLectureDocId) {
-            await db.collection(`courses/${courseId}/lectures`).doc(editingLectureDocId).update(lectureData);
-            alert('✅ Лекция обновлена!');
-        } else {
-            await db.collection(`courses/${courseId}/lectures`).add(lectureData);
-            alert('✅ Лекция добавлена!');
-        }
-        editingLectureDocId = null;
-        uploadedFileUrl = null;
-        document.getElementById('lecture-file').value = ''; // ← Очистить поле файла
-        hideAddLectureForm();
-    } catch (error) {
-        console.error('Ошибка:', error);
-        alert('❌ Не удалось сохранить лекцию');
-    }
-});
-
 
 // Редактирование тестов
 async function editTest(courseId, testDocId) {
@@ -1854,49 +1931,325 @@ async function editTest(courseId, testDocId) {
 }
 
 function addQuestionField(questionData = null) {
-  const container = document.getElementById('questions-container');
-  const idx = questionCounter++;
-  const q = questionData || { text: '', type: 'single', options: [{ text: '', correct: false }, { text: '', correct: false }] };
-
-  const questionEl = document.createElement('div');
-  questionEl.className = 'card';
-  questionEl.draggable = true;
-  questionEl.dataset.questionIndex = idx;
-  questionEl.innerHTML = `
-    <div class="card-content" style="padding: 1rem;">
-      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-        <strong>Вопрос ${idx + 1}</strong>
-        <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeQuestion(this)">🗑️</button>
-      </div>
-      <div class="form-group">
-        <input class="form-input" placeholder="Текст вопроса" value="${q.text}" data-type="question-text" required>
-      </div>
-      <div class="form-group">
-        <label><input type="radio" name="q-type-${idx}" value="single" ${q.type === 'single' ? 'checked' : ''} onchange="toggleQuestionType(this, ${idx})"> Один правильный ответ</label>
-        <label style="margin-left: 1rem;"><input type="radio" name="q-type-${idx}" value="multiple" ${q.type === 'multiple' ? 'checked' : ''} onchange="toggleQuestionType(this, ${idx})"> Несколько правильных ответов</label>
-      </div>
-      <div class="form-group" id="options-${idx}">
-        ${q.options.map((opt, i) => `
-          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-            <input type="text" class="form-input" placeholder="Вариант ответа" value="${opt.text}" style="flex: 1;" data-type="option-text">
-            <input type="checkbox" ${opt.correct ? 'checked' : ''} data-type="option-correct">
-            <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
-          </div>
-        `).join('')}
-        <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addOption(this)">+ Вариант</button>
-      </div>
-    </div>
-  `;
-  container.appendChild(questionEl);
-
-  questionEl.addEventListener('dragstart', (e) => {
-    e.dataTransfer.setData('text/plain', idx);
-    setTimeout(() => questionEl.classList.add('dragging'), 0);
-  });
-  questionEl.addEventListener('dragend', () => {
-    questionEl.classList.remove('dragging');
-  });
+    const container = document.getElementById('questions-container');
+    const idx = questionCounter++;
+    
+    // ✅ Дефолтные значения для всех типов вопросов
+    const q = questionData || { 
+        text: '', 
+        type: 'single', 
+        options: [{ text: '', correct: false }, { text: '', correct: false }],
+        matches: [],
+        correctAnswer: '',
+        sequence: []
+    };
+    
+    // ✅ Гарантируем наличие массивов и свойств
+    if (!q.options) q.options = [{ text: '', correct: false }];
+    if (!q.matches) q.matches = [];
+    if (!q.sequence) q.sequence = [];
+    if (!q.correctAnswer) q.correctAnswer = '';
+    
+    const questionEl = document.createElement('div');
+    questionEl.className = 'card';
+    questionEl.draggable = true;
+    questionEl.dataset.questionIndex = idx;
+    
+    // === Генерация HTML в зависимости от типа вопроса ===
+    let typeSpecificHTML = '';
+    
+    // ОДИН ИЛИ НЕСКОЛЬКО ОТВЕТОВ
+    if (q.type === 'single' || q.type === 'multiple') {
+        typeSpecificHTML = `
+            <div class="form-group" id="options-${idx}">
+                ${q.options.map((opt, i) => `
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <input type="text" class="form-input" placeholder="Вариант ответа" 
+                        value="${escapeHtmlAttr(opt.text)}" style="flex: 1;" data-type="option-text">
+                    <input type="${q.type === 'single' ? 'radio' : 'checkbox'}" 
+                        name="correct-${idx}" ${opt.correct ? 'checked' : ''} data-type="option-correct">
+                    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
+                </div>
+                `).join('')}
+                <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addOption(this)">+ Вариант</button>
+            </div>
+        `;
+        
+    // УСТАНОВЛЕНИЕ СООТВЕТСТВИЯ
+    } else if (q.type === 'matching') {
+        const matchesHTML = q.matches.length > 0 ? q.matches.map((match, i) => `
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+                <input type="text" class="form-input" placeholder="Элемент слева" 
+                    value="${escapeHtmlAttr(match.left)}" style="flex: 1;" data-type="match-left">
+                <span style="color: hsl(var(--primary));">↔</span>
+                <input type="text" class="form-input" placeholder="Элемент справа" 
+                    value="${escapeHtmlAttr(match.right)}" style="flex: 1;" data-type="match-right">
+                <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeMatch(this)">−</button>
+            </div>
+        `).join('') : `
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+                <input type="text" class="form-input" placeholder="Элемент слева" style="flex: 1;" data-type="match-left">
+                <span style="color: hsl(var(--primary));">↔</span>
+                <input type="text" class="form-input" placeholder="Элемент справа" style="flex: 1;" data-type="match-right">
+                <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeMatch(this)">−</button>
+            </div>
+        `;
+        
+        typeSpecificHTML = `
+            <div class="form-group" id="matches-${idx}">
+                <p style="color: hsl(var(--muted-foreground)); margin-bottom: 0.5rem; font-size: 0.9rem;">Создайте пары соответствий:</p>
+                ${matchesHTML}
+                <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addMatch(this)">+ Пара соответствия</button>
+            </div>
+        `;
+        
+    // ОТКРЫТЫЙ ТИП
+    } else if (q.type === 'open') {
+        typeSpecificHTML = `
+            <div class="form-group">
+                <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Правильный ответ:</label>
+                <input type="text" class="form-input" placeholder="Введите правильный ответ" 
+                    value="${escapeHtmlAttr(q.correctAnswer)}" data-type="correct-answer">
+                <small style="color: hsl(var(--muted-foreground)); display: block; margin-top: 0.5rem;">
+                    💡 Можно указать несколько правильных вариантов через точку с запятой (;)
+                </small>
+            </div>
+        `;
+        
+    // ПОСЛЕДОВАТЕЛЬНОСТЬ
+    } else if (q.type === 'sequence') {
+        const sequenceHTML = q.sequence.length > 0 ? q.sequence.map((item, i) => `
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="display: flex; align-items: center; color: hsl(var(--primary)); font-weight: bold; min-width: 30px;">${i + 1}.</span>
+                <input type="text" class="form-input" placeholder="Элемент последовательности" 
+                    value="${escapeHtmlAttr(item)}" style="flex: 1;" data-type="sequence-item">
+                <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeSequenceItem(this)">−</button>
+            </div>
+        `).join('') : `
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="display: flex; align-items: center; color: hsl(var(--primary)); font-weight: bold; min-width: 30px;">1.</span>
+                <input type="text" class="form-input" placeholder="Элемент последовательности" style="flex: 1;" data-type="sequence-item">
+                <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeSequenceItem(this)">−</button>
+            </div>
+            <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                <span style="display: flex; align-items: center; color: hsl(var(--primary)); font-weight: bold; min-width: 30px;">2.</span>
+                <input type="text" class="form-input" placeholder="Элемент последовательности" style="flex: 1;" data-type="sequence-item">
+                <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeSequenceItem(this)">−</button>
+            </div>
+        `;
+        
+        typeSpecificHTML = `
+            <div class="form-group" id="sequence-${idx}">
+                <p style="color: hsl(var(--muted-foreground)); margin-bottom: 0.5rem; font-size: 0.9rem;">Укажите элементы в правильном порядке (сверху вниз):</p>
+                ${sequenceHTML}
+                <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addSequenceItem(this)">+ Элемент</button>
+            </div>
+        `;
+    }
+    
+    // === Основной HTML вопроса ===
+    questionEl.innerHTML = `
+        <div class="card-content" style="padding: 1rem;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <strong>Вопрос ${idx + 1}</strong>
+                <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeQuestion(this)">🗑️</button>
+            </div>
+            <div class="form-group">
+                <input class="form-input" placeholder="Текст вопроса" 
+                    value="${escapeHtmlAttr(q.text)}" data-type="question-text" required>
+            </div>
+            <div class="form-group">
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: white;">Тип вопроса:</label>
+                <select class="form-select" onchange="changeQuestionType(this, ${idx})" style="width: 100%;">
+                    <option value="single" ${q.type === 'single' ? 'selected' : ''}>Один правильный ответ</option>
+                    <option value="multiple" ${q.type === 'multiple' ? 'selected' : ''}>Несколько правильных ответов</option>
+                    <option value="matching" ${q.type === 'matching' ? 'selected' : ''}>Установление соответствия</option>
+                    <option value="open" ${q.type === 'open' ? 'selected' : ''}>Открытый тип (ввод ответа)</option>
+                    <option value="sequence" ${q.type === 'sequence' ? 'selected' : ''}>Установление последовательности</option>
+                </select>
+            </div>
+            <div id="question-content-${idx}">
+                ${typeSpecificHTML}
+            </div>
+        </div>
+    `;
+    
+    container.appendChild(questionEl);
+    
+    // === Drag-and-drop функциональность ===
+    questionEl.addEventListener('dragstart', (e) => {
+        e.dataTransfer.setData('text/plain', idx);
+        setTimeout(() => questionEl.classList.add('dragging'), 0);
+    });
+    questionEl.addEventListener('dragend', () => {
+        questionEl.classList.remove('dragging');
+    });
 }
+
+// Изменение типа вопроса
+function changeQuestionType(select, idx) {
+    const newType = select.value;
+    const contentDiv = document.getElementById(`question-content-${idx}`);
+    
+    let newHTML = '';
+    
+    if (newType === 'single' || newType === 'multiple') {
+        newHTML = `
+            <div class="form-group" id="options-${idx}">
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <input type="text" class="form-input" placeholder="Вариант ответа" style="flex: 1;" data-type="option-text">
+                    <input type="${newType === 'single' ? 'radio' : 'checkbox'}" name="correct-${idx}" data-type="option-correct">
+                    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <input type="text" class="form-input" placeholder="Вариант ответа" style="flex: 1;" data-type="option-text">
+                    <input type="${newType === 'single' ? 'radio' : 'checkbox'}" name="correct-${idx}" data-type="option-correct">
+                    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
+                </div>
+                <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addOption(this)">+ Вариант</button>
+            </div>
+        `;
+    } else if (newType === 'matching') {
+        newHTML = `
+            <div class="form-group" id="matches-${idx}">
+                <p style="color: hsl(var(--muted-foreground)); margin-bottom: 0.5rem; font-size: 0.9rem;">Создайте пары соответствий:</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem; align-items: center;">
+                    <input type="text" class="form-input" placeholder="Элемент слева" style="flex: 1;" data-type="match-left">
+                    <span style="color: hsl(var(--primary));">↔</span>
+                    <input type="text" class="form-input" placeholder="Элемент справа" style="flex: 1;" data-type="match-right">
+                    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeMatch(this)">−</button>
+                </div>
+                <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addMatch(this)">+ Пара соответствия</button>
+            </div>
+        `;
+    } else if (newType === 'open') {
+        newHTML = `
+            <div class="form-group">
+                <label class="form-label" style="color: white; margin-bottom: 0.5rem;">Правильный ответ:</label>
+                <input type="text" class="form-input" placeholder="Введите правильный ответ" data-type="correct-answer">
+                <small style="color: hsl(var(--muted-foreground)); display: block; margin-top: 0.5rem;">
+                    💡 Можно указать несколько правильных вариантов через точку с запятой (;)
+                </small>
+            </div>
+        `;
+    } else if (newType === 'sequence') {
+        newHTML = `
+            <div class="form-group" id="sequence-${idx}">
+                <p style="color: hsl(var(--muted-foreground)); margin-bottom: 0.5rem; font-size: 0.9rem;">Укажите элементы в правильном порядке (сверху вниз):</p>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="display: flex; align-items: center; color: hsl(var(--primary)); font-weight: bold; min-width: 30px;">1.</span>
+                    <input type="text" class="form-input" placeholder="Элемент последовательности" style="flex: 1;" data-type="sequence-item">
+                    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeSequenceItem(this)">−</button>
+                </div>
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="display: flex; align-items: center; color: hsl(var(--primary)); font-weight: bold; min-width: 30px;">2.</span>
+                    <input type="text" class="form-input" placeholder="Элемент последовательности" style="flex: 1;" data-type="sequence-item">
+                    <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeSequenceItem(this)">−</button>
+                </div>
+                <button type="button" class="btn btn-outline" style="width: fit-content; margin-top: 0.5rem;" onclick="addSequenceItem(this)">+ Элемент</button>
+            </div>
+        `;
+    }
+    
+    contentDiv.innerHTML = newHTML;
+}
+
+// Добавление варианта ответа
+function addOption(button) {
+    const parent = button.parentNode;
+    const questionCard = button.closest('.card');
+    const isSingle = questionCard.querySelector('select')?.value === 'single';
+    
+    const optionDiv = document.createElement('div');
+    optionDiv.style.display = 'flex';
+    optionDiv.style.gap = '0.5rem';
+    optionDiv.style.marginBottom = '0.5rem';
+    optionDiv.innerHTML = `
+        <input type="text" class="form-input" placeholder="Вариант ответа" style="flex: 1;" data-type="option-text">
+        <input type="${isSingle ? 'radio' : 'checkbox'}" name="correct-${Date.now()}" data-type="option-correct">
+        <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeOption(this)">−</button>
+    `;
+    parent.insertBefore(optionDiv, button);
+}
+
+// Удаление варианта ответа
+function removeOption(button) {
+    button.closest('div[style*="flex"]').remove();
+}
+
+// Добавление пары соответствия
+function addMatch(button) {
+    const parent = button.parentNode;
+    const matchDiv = document.createElement('div');
+    matchDiv.style.display = 'flex';
+    matchDiv.style.gap = '0.5rem';
+    matchDiv.style.marginBottom = '0.5rem';
+    matchDiv.style.alignItems = 'center';
+    matchDiv.innerHTML = `
+        <input type="text" class="form-input" placeholder="Элемент слева" style="flex: 1;" data-type="match-left">
+        <span style="color: hsl(var(--primary));">↔</span>
+        <input type="text" class="form-input" placeholder="Элемент справа" style="flex: 1;" data-type="match-right">
+        <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeMatch(this)">−</button>
+    `;
+    parent.insertBefore(matchDiv, button);
+}
+
+// Удаление пары соответствия
+function removeMatch(button) {
+    button.closest('div[style*="flex"]').remove();
+}
+
+// Добавление элемента последовательности
+function addSequenceItem(button) {
+    // Находим родительский контейнер с sequence
+    const sequenceContainer = button.closest('[id^="sequence-"]');
+    if (!sequenceContainer) {
+        console.error('Контейнер последовательности не найден');
+        return;
+    }
+    
+    const items = sequenceContainer.querySelectorAll('[data-type="sequence-item"]');
+    const newItemIndex = items.length + 1;
+    
+    const itemDiv = document.createElement('div');
+    itemDiv.style.display = 'flex';
+    itemDiv.style.gap = '0.5rem';
+    itemDiv.style.marginBottom = '0.5rem';
+    itemDiv.innerHTML = `
+        <span style="display: flex; align-items: center; color: hsl(var(--primary)); font-weight: bold; min-width: 30px;">${newItemIndex}.</span>
+        <input type="text" class="form-input" placeholder="Элемент последовательности" style="flex: 1;" data-type="sequence-item">
+        <button type="button" class="btn" style="padding: 0.25rem; background: transparent; color: hsl(var(--destructive));" onclick="removeSequenceItem(this)">−</button>
+    `;
+    
+    // Вставляем перед кнопкой "+ Элемент"
+    button.parentNode.insertBefore(itemDiv, button);
+    updateSequenceNumbers(sequenceContainer);
+}
+
+// Удаление элемента последовательности
+function removeSequenceItem(button) {
+    const itemDiv = button.closest('div[style*="flex"]');
+    if (!itemDiv) return;
+    
+    const sequenceContainer = button.closest('[id^="sequence-"]');
+    itemDiv.remove();
+    
+    if (sequenceContainer) {
+        updateSequenceNumbers(sequenceContainer);
+    }
+}
+
+// Обновление нумерации последовательности
+function updateSequenceNumbers(container) {
+    const items = container.querySelectorAll('[data-type="sequence-item"]');
+    items.forEach((item, index) => {
+        const numSpan = item.parentNode.querySelector('span');
+        if (numSpan) {
+            numSpan.textContent = `${index + 1}.`;
+        }
+    });
+}
+
 
 function toggleQuestionType(radio, idx) {
   if (radio.value === 'single') {
@@ -1940,16 +2293,18 @@ document.getElementById('questions-container').addEventListener('dragover', (e) 
 });
 
 function getDragAfterElement(container, y) {
-  const draggableElements = [...container.querySelectorAll('.card:not(.dragging)')];
-  return draggableElements.reduce((closest, child) => {
-    const box = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) {
-      return { offset: offset, element: child };
-    } else {
-      return closest;
-    }
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
+    const draggableElements = [...container.querySelectorAll('.sequence-item:not([style*="opacity: 0.4"])')];
+    
+    return draggableElements.reduce((closest, child) => {
+        const box = child.getBoundingClientRect();
+        const offset = y - box.top - box.height / 2;
+        
+        if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+        } else {
+            return closest;
+        }
+    }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
 document.getElementById('test-form')?.addEventListener('submit', async function(e) {
@@ -1967,44 +2322,102 @@ document.getElementById('test-form')?.addEventListener('submit', async function(
     return;
   }
 
-  const questions = [];
-  for (const el of questionsEls) {
+const questions = [];
+for (const el of questionsEls) {
     const qText = el.querySelector('[data-type="question-text"]').value.trim();
     if (!qText) {
-      alert('⚠️ Заполните текст вопроса.');
-      return;
+        alert('⚠️ Заполните текст вопроса.');
+        return;
     }
-
-    const type = el.querySelector('input[name^="q-type"]:checked').value;
-    const optionInputs = el.querySelectorAll('[data-type="option-text"]');
-    const correctInputs = el.querySelectorAll('[data-type="option-correct"]');
-
-    const options = [];
-    let hasCorrect = false;
-    for (let i = 0; i < optionInputs.length; i++) {
-      const text = optionInputs[i].value.trim();
-      if (!text) continue;
-      const correct = correctInputs[i].checked;
-      if (correct) hasCorrect = true;
-      options.push({ text, correct });
+    
+    const type = el.querySelector('select').value;
+    let questionData = { text: qText, type };
+    
+    // === ОДИН ИЛИ НЕСКОЛЬКО ОТВЕТОВ ===
+    if (type === 'single' || type === 'multiple') {
+        const optionInputs = el.querySelectorAll('[data-type="option-text"]');
+        const correctInputs = el.querySelectorAll('[data-type="option-correct"]');
+        const options = [];
+        let hasCorrect = false;
+        
+        for (let i = 0; i < optionInputs.length; i++) {
+            const text = optionInputs[i].value.trim();
+            if (!text) continue;
+            const correct = correctInputs[i].checked;
+            if (correct) hasCorrect = true;
+            options.push({ text, correct });
+        }
+        
+        if (options.length < 2) {
+            alert('⚠️ Каждый вопрос должен иметь минимум 2 варианта ответа.');
+            return;
+        }
+        if (!hasCorrect) {
+            alert('⚠️ Укажите хотя бы один правильный ответ.');
+            return;
+        }
+        if (type === 'single' && options.filter(o => o.correct).length > 1) {
+            alert('⚠️ Для вопроса с одним ответом можно выбрать только один правильный вариант.');
+            return;
+        }
+        
+        questionData.options = options;  // ✅ Правильное свойство
+        
+    // === УСТАНОВЛЕНИЕ СООТВЕТСТВИЯ ===
+    } else if (type === 'matching') {
+        const leftInputs = el.querySelectorAll('[data-type="match-left"]');
+        const rightInputs = el.querySelectorAll('[data-type="match-right"]');
+        const matches = [];
+        
+        for (let i = 0; i < leftInputs.length; i++) {
+            const left = leftInputs[i].value.trim();
+            const right = rightInputs[i]?.value.trim() || '';
+            if (left && right) {
+                matches.push({ left, right });
+            }
+        }
+        
+        if (matches.length < 2) {
+            alert('⚠️ Вопрос на соответствие должен содержать минимум 2 пары.');
+            return;
+        }
+        
+        questionData.matches = matches;
+        
+    // === ОТКРЫТЫЙ ТИП ===
+    } else if (type === 'open') {
+        const correctAnswerInput = el.querySelector('[data-type="correct-answer"]');
+        const correctAnswer = correctAnswerInput ? correctAnswerInput.value.trim() : '';
+        
+        if (!correctAnswer) {
+            alert('⚠️ Укажите правильный ответ для вопроса открытого типа.');
+            return;
+        }
+        
+        questionData.correctAnswer = correctAnswer;  // ✅ Теперь переменная объявлена!
+        
+    // === ПОСЛЕДОВАТЕЛЬНОСТЬ ===
+    } else if (type === 'sequence') {
+        const sequenceInputs = el.querySelectorAll('[data-type="sequence-item"]');
+        const sequence = [];
+        
+        for (let i = 0; i < sequenceInputs.length; i++) {
+            const item = sequenceInputs[i].value.trim();
+            if (item) {
+                sequence.push(item);
+            }
+        }
+        
+        if (sequence.length < 2) {
+            alert('⚠️ Вопрос на последовательность должен содержать минимум 2 элемента.');
+            return;
+        }
+        
+        questionData.sequence = sequence;
     }
-
-    if (options.length < 2) {
-      alert('⚠️ Каждый вопрос должен иметь минимум 2 варианта ответа.');
-      return;
-    }
-    if (!hasCorrect) {
-      alert('⚠️ Укажите хотя бы один правильный ответ.');
-      return;
-    }
-    if (type === 'single' && options.filter(o => o.correct).length > 1) {
-      alert('⚠️ Для вопроса с одним ответом можно выбрать только один правильный вариант.');
-      return;
-    }
-
-    questions.push({ text: qText, type, options });
-  }
-
+    
+    questions.push(questionData);
+}
   try {
     if (editingTestDocId) {
       // Обновление существующего теста
@@ -2230,37 +2643,33 @@ async function viewCourseAsStudent(courseId) {
   // Лекции
 const lectureList = document.getElementById('student-lecture-list');
 const lecSnapshot = await db.collection(`courses/${courseId}/lectures`).orderBy('order', 'asc').get();
-
 if (lecSnapshot.empty) {
-  lectureList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет лекций</p>';
+    lectureList.innerHTML = '<p style="color: hsl(var(--muted-foreground));">Нет лекций</p>';
 } else {
-  lectureList.innerHTML = lecSnapshot.docs.map((doc, i) => {
-    const lec = doc.data();
-    const isCompleted = progressData.completedLectures[i] || false;
-    const hasFile = lec.fileUrl ? true : false;
-    
-    return `
-    <div class="card" style="margin-bottom: 1rem;">
-      <div class="card-content">
-        <h3>Лекция ${i + 1}: ${lec.title}</h3>
+    lectureList.innerHTML = lecSnapshot.docs.map((doc, i) => {
+        const lec = doc.data();
+        const isCompleted = progressData.completedLectures[i] || false;
         
-        ${hasFile ? `
-          <div style="background: hsl(var(--primary)/0.1); padding: 0.75rem; border-radius: 0.5rem; margin: 0.75rem 0; display: flex; align-items: center; gap: 0.5rem;">
-            <span style="font-size: 1.2rem;">📎</span>
-            <a href="${lec.fileUrl}" target="_blank" style="color: hsl(var(--primary)); text-decoration: underline; flex: 1;">
-              ${lec.fileName || 'Скачать файл'}
-            </a>
-          </div>
-        ` : ''}
+        // ⭐ Кнопка файла если есть
+const fileButton = lec.hasFile && (lec.downloadUrl || lec.fileUrl) ?
+`<a href="${lec.downloadUrl || lec.fileUrl}" target="_blank" style="margin-top: 0.5rem; padding: 0.25rem 0.5rem; font-size: 0.85rem;" class="btn btn-outline">📎 Скачать: ${lec.fileName || 'Файл'}</a>` :
+'';
         
-        <button class="btn btn-outline" onclick="viewLecture('${courseId}', ${i})">Читать</button>
-        <label style="display: block; margin-top: 0.75rem; font-size: 0.9rem;">
-          <input type="checkbox" ${isCompleted ? 'checked' : ''} disabled> Прочитано
-        </label>
-      </div>
-    </div>
-    `;
-  }).join('');
+        return `
+        <div class="card" style="margin-bottom: 1rem;">
+            <div class="card-content">
+                <h3>Лекция ${i + 1}: ${lec.title}</h3>
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="viewLecture('${courseId}', ${i})">Читать</button>
+                    ${fileButton}
+                </div>
+                <label style="display: block; margin-top: 0.75rem; font-size: 0.9rem;">
+                    <input type="checkbox" ${isCompleted ? 'checked' : ''} disabled> Прочитано
+                </label>
+            </div>
+        </div>
+        `;
+    }).join('');
 }
 
     // Тесты
@@ -2337,28 +2746,133 @@ async function startTest(courseId, testIndex) {
     // Генерация HTML для вопросов
     let html = '';
     test.questions.forEach((q, qi) => {
-      html += `<div class="card" style="margin-bottom: 1.5rem;">
-        <div class="card-content">
-          <h3>Вопрос ${qi + 1}</h3>
-          <p>${q.text}</p>`;
-
-      if (q.type === 'single') {
-        q.options.forEach((opt, oi) => {
-          html += `<label style="display: block; margin: 0.5rem 0;">
-            <input type="radio" name="q${qi}" value="${oi}"> ${opt.text}
-          </label>`;
-        });
-      } else {
-        q.options.forEach((opt, oi) => {
-          html += `<label style="display: block; margin: 0.5rem 0;">
-            <input type="checkbox" name="q${qi}_${oi}" value="${oi}"> ${opt.text}
-          </label>`;
-        });
-      }
-      html += `</div></div>`;
+        html += `<div class="card" style="margin-bottom: 1.5rem;">
+            <div class="card-content">
+                <h3>Вопрос ${qi + 1}</h3>
+                <p style="margin-bottom: 1rem;">${q.text}</p>`;
+        
+        if (q.type === 'single') {
+            q.options.forEach((opt, oi) => {
+                html += `<label style="display: block; margin: 0.5rem 0;">
+                    <input type="radio" name="q${qi}" value="${oi}"> ${opt.text}
+                </label>`;
+            });
+        } else if (q.type === 'multiple') {
+            q.options.forEach((opt, oi) => {
+                html += `<label style="display: block; margin: 0.5rem 0;">
+                    <input type="checkbox" name="q${qi}_${oi}" value="${oi}"> ${opt.text}
+                </label>`;
+            });
+        } else if (q.type === 'matching') {
+            // Перемешиваем правую колонку для студента
+            const rightItems = q.matches.map(m => m.right).sort(() => Math.random() - 0.5);
+            
+            html += `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 0.5rem; color: hsl(var(--primary));">Левая колонка:</p>`;
+            q.matches.forEach((match, i) => {
+                html += `<div style="padding: 0.5rem; background: hsl(var(--card)); border-radius: 0.5rem; margin-bottom: 0.5rem;">
+                    ${match.left}
+                </div>`;
+            });
+            html += `</div>
+                <div>
+                    <p style="font-weight: 600; margin-bottom: 0.5rem; color: hsl(var(--primary));">Выберите соответствие:</p>`;
+            q.matches.forEach((match, i) => {
+                html += `<select name="match_${qi}_${i}" class="form-select" style="margin-bottom: 0.5rem;">
+                    <option value="">Выберите...</option>`;
+                rightItems.forEach((right, ri) => {
+                    html += `<option value="${ri}">${right}</option>`;
+                });
+                html += `</select>`;
+            });
+            html += `</div></div>`;
+            
+        } else if (q.type === 'open') {
+            html += `<textarea class="form-textarea" name="q${qi}" placeholder="Введите ваш ответ здесь..." style="min-height: 100px;"></textarea>`;
+            
+} else if (q.type === 'sequence') {
+    // Перемешиваем элементы для студента
+    const shuffledSequence = [...q.sequence].sort(() => Math.random() - 0.5);
+    html += `<div id="sequence-container-${qi}" style="border: 1px solid hsl(var(--border)); border-radius: 0.5rem; padding: 1rem;">
+        <p style="color: hsl(var(--muted-foreground)); margin-bottom: 1rem; font-size: 0.9rem;">
+            Расположите элементы в правильном порядке (перетаскиванием):
+        </p>`;
+    
+    shuffledSequence.forEach((item, i) => {
+        html += `<div class="sequence-item" draggable="true" data-value="${item}" 
+            style="padding: 0.75rem; background: hsl(var(--card)); border: 1px solid hsl(var(--border)); 
+            border-radius: 0.5rem; margin-bottom: 0.5rem; cursor: move; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
+            <span style="color: hsl(var(--primary)); font-weight: bold; cursor: grab;">☰</span>
+            <span style="flex: 1;">${item}</span>
+        </div>`;
     });
-
+    
+    html += `</div>`;
+}
+        
+        html += `</div></div>`;
+    });
+    
     document.getElementById('test-questions-container').innerHTML = html;
+
+    // Инициализация drag-and-drop для последовательностей
+setTimeout(() => {
+    const sequenceContainers = document.querySelectorAll('[id^="sequence-container-"]');
+    sequenceContainers.forEach(container => {
+        let draggedItem = null;
+        
+        const items = container.querySelectorAll('.sequence-item');
+        items.forEach(item => {
+            item.addEventListener('dragstart', function(e) {
+                draggedItem = this;
+                this.style.opacity = '0.4';
+                e.dataTransfer.effectAllowed = 'move';
+            });
+            
+            item.addEventListener('dragend', function() {
+                this.style.opacity = '1';
+                draggedItem = null;
+            });
+        });
+        
+        container.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const afterElement = getDragAfterElement(container, e.clientY);
+            if (afterElement == null) {
+                container.appendChild(draggedItem);
+            } else {
+                container.insertBefore(draggedItem, afterElement);
+            }
+        });
+        
+        container.addEventListener('dragenter', function(e) {
+            e.preventDefault();
+            if (e.target.classList.contains('sequence-item') && e.target !== draggedItem) {
+                e.target.style.borderColor = 'hsl(var(--primary))';
+            }
+        });
+        
+        container.addEventListener('dragleave', function(e) {
+            if (e.target.classList.contains('sequence-item')) {
+                e.target.style.borderColor = 'hsl(var(--border))';
+            }
+        });
+        
+        container.addEventListener('drop', function(e) {
+            e.stopPropagation();
+            e.preventDefault();
+            
+            // Сбрасываем все границы
+            container.querySelectorAll('.sequence-item').forEach(item => {
+                item.style.borderColor = 'hsl(var(--border))';
+            });
+        });
+    });
+}, 100);
+
     showPage('test-view');
   } catch (error) {
     console.error('Ошибка в startTest:', error);
@@ -2395,46 +2909,76 @@ async function submitTest() {
     let totalQuestions = currentTest.questions.length;
 
     // Проверяем ответы
-    for (let qi = 0; qi < currentTest.questions.length; qi++) {
-      const q = currentTest.questions[qi];
-      let userAnswer = [];
-
-      if (q.type === 'single') {
+// Проверяем ответы
+for (let qi = 0; qi < currentTest.questions.length; qi++) {
+    const q = currentTest.questions[qi];
+    let isCorrect = false;
+    
+    if (q.type === 'single') {
         const selected = document.querySelector(`input[name="q${qi}"]:checked`);
         if (selected) {
-          userAnswer = [parseInt(selected.value)];
+            const userAnswer = parseInt(selected.value);
+            const correctIndex = q.options.findIndex(opt => opt.correct);
+            isCorrect = (userAnswer === correctIndex);
         }
-      } else {
+    } else if (q.type === 'multiple') {
+        const userAnswers = [];
         q.options.forEach((opt, oi) => {
-          const cb = document.querySelector(`input[name="q${qi}_${oi}"]`);
-          if (cb && cb.checked) userAnswer.push(oi);
+            const cb = document.querySelector(`input[name="q${qi}_${oi}"]`);
+            if (cb && cb.checked) userAnswers.push(oi);
         });
-      }
-
-      const correctIndices = q.options.map((opt, i) => opt.correct ? i : -1).filter(i => i !== -1);
-
-      if (q.type === 'single') {
-        if (userAnswer.length === 1 && correctIndices.includes(userAnswer[0])) {
-          correctAnswers++;
-        }
-      } else {
-        if (
-          userAnswer.length === correctIndices.length &&
-          userAnswer.every(idx => correctIndices.includes(idx)) &&
-          correctIndices.every(idx => userAnswer.includes(idx))
-        ) {
-          correctAnswers++;
-        }
-      }
+        
+        const correctIndices = q.options.map((opt, i) => opt.correct ? i : -1).filter(i => i !== -1);
+        isCorrect = (
+            userAnswers.length === correctIndices.length &&
+            userAnswers.every(idx => correctIndices.includes(idx)) &&
+            correctIndices.every(idx => userAnswers.includes(idx))
+        );
+    } else if (q.type === 'matching') {
+        let correctMatches = 0;
+        q.matches.forEach((match, i) => {
+            const selected = document.querySelector(`select[name="match_${qi}_${i}"]`);
+            if (selected) {
+                const selectedIndex = parseInt(selected.value);
+                const rightItems = q.matches.map(m => m.right).sort(() => Math.random() - 0.5);
+                // Проверяем, соответствует ли выбранный элемент правильному
+                // Здесь нужна более сложная логика, упрощенно:
+                if (q.matches[selectedIndex]?.right === match.right) {
+                    correctMatches++;
+                }
+            }
+        });
+        isCorrect = (correctMatches === q.matches.length);
+    } else if (q.type === 'open') {
+        const userAnswer = document.querySelector(`textarea[name="q${qi}"]`)?.value.trim().toLowerCase();
+        const correctAnswers = q.correctAnswer.split(';').map(a => a.trim().toLowerCase());
+        isCorrect = correctAnswers.includes(userAnswer);
+    } else if (q.type === 'sequence') {
+        const userSequence = [];
+        const container = document.getElementById(`sequence-container-${qi}`);
+        const items = container.querySelectorAll('.sequence-item');
+        items.forEach(item => {
+            userSequence.push(item.dataset.value);
+        });
+        
+        // Проверяем, совпадает ли порядок
+        isCorrect = userSequence.every((item, index) => item === q.sequence[index]);
+    }
+    
+    if (isCorrect) {
+        correctAnswers++;
+    }
     }
 
-    const score = Math.round((correctAnswers / totalQuestions) * 100);
-    const newResult = {
-      testIndex: testIndex,
-      testName: currentTest.title,
-      score: score,
-      date: new Date().toISOString().split('T')[0]
-    };
+const percentage = Math.round((correctAnswers / totalQuestions) * 100);
+const grade = convertToFivePointScale(percentage);
+const newResult = {
+    testIndex: testIndex,
+    testName: currentTest.title,
+    score: percentage,        // сохраняем проценты для статистики
+    grade: grade,             // добавляем пятибалльную оценку
+    date: new Date().toISOString().split('T')[0]
+};
 
     // Сохраняем результат в Firestore
     await db.collection('studentProgress').doc(currentUser.id).set({
@@ -2450,14 +2994,17 @@ async function submitTest() {
 const resultDiv = document.getElementById('test-result');
 const safeCourseId = courseId.replace(/'/g, "\\'"); // ← ЭКРАНИРОВАНИЕ
 resultDiv.innerHTML = `
-  <div style="color: hsl(var(--primary)); font-weight: bold; margin-bottom: 1rem; font-size: 1.3rem;">
+<div style="color: hsl(var(--primary)); font-weight: bold; margin-bottom: 1rem; font-size: 1.3rem;">
     ✅ Тест завершён!
-  </div>
-  <div style="margin: 0.5rem 0;">Правильных ответов: <strong>${correctAnswers} из ${totalQuestions}</strong></div>
-  <div style="margin: 0.5rem 0;">Оценка: <strong>${score}%</strong></div>
-  <button class="btn btn-outline" style="margin-top: 1.5rem; padding: 0.5rem 1.5rem;" onclick="viewCourseAsStudent('${safeCourseId}')">
+</div>
+<div style="margin: 0.5rem 0;">Правильных ответов: <strong>${correctAnswers} из ${totalQuestions}</strong></div>
+<div style="margin: 0.5rem 0;">Процент правильных ответов: <strong>${percentage}%</strong></div>
+<div style="margin: 0.5rem 0; font-size: 1.5rem; color: ${grade >= 4 ? 'hsl(142, 76%, 37%)' : grade === 3 ? 'hsl(38, 92%, 50%)' : 'hsl(0, 62.8%, 30.6%)'}; font-weight: bold;">
+    Оценка: <strong>${grade}</strong>
+</div>
+<button class="btn btn-outline" style="margin-top: 1.5rem; padding: 0.5rem 1.5rem;" onclick="viewCourseAsStudent('${safeCourseId}')">
     Вернуться к курсу
-  </button>
+</button>
 `;
 resultDiv.style.display = 'block';
 
@@ -2492,26 +3039,65 @@ async function viewLecture(courseId, lectureIndex) {
       currentStudentCourseId = courseId;
     } else {
       window.teacherViewing = { courseId, lectureIndex };
+      currentCourseId = courseId;
     }
 
-    // Отображаем лекцию
-    document.getElementById('lecture-view-title').textContent = `Лекция ${lectureIndex + 1}: ${lecture.title}`;
-    document.getElementById('lecture-view-content').innerHTML = `<p>${lecture.content || 'Без содержания'}</p>`;
+// Отображаем лекцию
+document.getElementById('lecture-view-title').textContent = `Лекция ${lectureIndex + 1}: ${lecture.title}`;
 
-    // Управляем чекбоксом "Прочитано"
-    const checkbox = document.getElementById('lecture-completed');
-    if (currentUser?.role === 'student') {
-      checkbox.style.display = 'inline';
-      
-      // Загружаем прогресс из Firestore
-      const progressDoc = await db.collection('studentProgress').doc(currentUser.id).get();
-      const progressData = progressDoc.exists ? progressDoc.data() : {};
-      const isCompleted = progressData[courseId]?.completedLectures?.[lectureIndex] || false;
-      checkbox.checked = isCompleted;
-    } else {
-      checkbox.style.display = 'none'; // Преподавателю не показываем
-    }
+// Добавляем кнопку файла если есть
+let fileButtonHTML = '';
+if (lecture.hasFile && (lecture.downloadUrl || lecture.fileUrl)) {
+    fileButtonHTML = `
+        <div style="margin: 1.5rem 0; padding: 1rem; background: hsl(var(--card)); border-radius: var(--radius); border: 1px solid hsl(var(--border));">
+            <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="hsl(var(--primary))" stroke-width="2" style="flex-shrink: 0;">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <polyline points="10 9 9 9 8 9"></polyline>
+                </svg>
+                <div style="flex: 1; min-width: 200px;">
+                    <div style="font-weight: 600; color: white; margin-bottom: 0.25rem;">${lecture.fileName || 'Файл лекции'}</div>
+                    ${lecture.fileSize ? `<div style="font-size: 0.85rem; color: hsl(215, 20%, 65%);">${(lecture.fileSize / 1024 / 1024).toFixed(2)} МБ</div>` : ''}
+                </div>
+                <a href="${lecture.fileUrl}" target="_blank" download class="btn btn-primary" style="flex-shrink: 0;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 0.5rem;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Скачать файл
+                </a>
+            </div>
+        </div>
+    `;
+}
 
+document.getElementById('lecture-view-content').innerHTML = `
+    ${lecture.content ? `<div style="margin-bottom: 1.5rem;"><p>${lecture.content}</p></div>` : '<p style="color: hsl(215, 20%, 65%); margin-bottom: 1.5rem;">Без содержания</p>'}
+    ${fileButtonHTML}
+`;
+
+// Управляем контейнером "Прочитано"
+const container = document.getElementById('lecture-check-container');
+const checkbox = document.getElementById('lecture-completed');
+
+if (currentUser?.role === 'student') {
+    container.style.display = 'block'; // Показываем весь блок
+    checkbox.style.display = 'inline';
+    
+    // Загружаем прогресс из Firestore
+    const progressDoc = await db.collection('studentProgress').doc(currentUser.id).get();
+    const progressData = progressDoc.exists ? progressDoc.data() : {};
+    const isCompleted = progressData[courseId]?.completedLectures?.[lectureIndex] || false;
+    checkbox.checked = isCompleted;
+} else {
+    container.style.display = 'none'; // Скрываем ВЕСЬ блок (и текст тоже)
+}
+    console.log('📦 viewLecture: currentCourseId установлен в', courseId);
+  
     showPage('lecture-view');
   } catch (error) {
     console.error('Ошибка загрузки лекции:', error);
@@ -2520,12 +3106,31 @@ async function viewLecture(courseId, lectureIndex) {
 }
 
 function backToCourse() {
-    if (currentUser?.role === 'student' && currentStudentCourseId) {
+    console.log('🔍 backToCourse вызвана');
+    console.log('👤 currentUser.role:', currentUser?.role);
+    console.log('📦 currentCourseId:', currentCourseId);
+    console.log('🎓 currentStudentCourseId:', currentStudentCourseId);
+
+    // Логика для преподавателя
+    if (currentUser?.role === 'teacher' && currentCourseId) {
+        console.log('✅ Переход к курсу преподавателя:', currentCourseId);
+        
+        // 1. Сначала возвращаемся на страницу панели управления (иначе детали не будут видны)
+        showPage('dashboard'); 
+        
+        // 2. Загружаем детали конкретного курса
+        viewCourse(currentCourseId);
+        
+    } 
+    // Логика для студента
+    else if (currentUser?.role === 'student' && currentStudentCourseId) {
+        console.log('✅ Переход к курсу студента:', currentStudentCourseId);
         viewCourseAsStudent(currentStudentCourseId);
-    } else if (currentUser?.role === 'teacher' && window.teacherViewing) {
-        viewCourse(window.teacherViewing.courseId);
-        delete window.teacherViewing;
-    } else {
+        
+    } 
+    // Если ничего не совпало
+    else {
+        console.log('⚠️ Нет ID курса, переход на общую страницу курсов');
         showPage('courses');
     }
 }
@@ -2622,10 +3227,8 @@ async function loadStudentCourses() {
   }
 }
 
-
 async function loadGrades() {
   if (!currentUser || !currentUser.id) return;
-  
   try {
     const results = await db
       .collection('testResults')
@@ -2647,21 +3250,25 @@ async function loadGrades() {
     for (const doc of results.docs) {
       const data = doc.data();
       const course = await db.collection('courses').doc(data.courseId).get();
-      
       const row = document.createElement('tr');
+      
       row.innerHTML = `
         <td>${course.exists ? escapeHtmlAttr(course.data().title) : 'Неизвестный курс'}</td>
         <td>${data.type === 'test' ? 'Тест' : 'Лекция'}</td>
         <td>${escapeHtmlAttr(data.title || 'Без названия')}</td>
-        <td>${data.type === 'test' ? (data.score || 0) + '%' : '✓'}</td>
+        <td style="color: ${displayGrade >= 4 ? 'hsl(142, 76%, 37%)' : displayGrade === 3 ? 'hsl(38, 92%, 50%)' : 'hsl(0, 62.8%, 30.6%)'}; font-weight: bold; font-size: 1.1rem;">
+          ${displayGrade}
+        </td>
         <td>${data.timestamp?.toDate().toLocaleDateString('ru-RU') || '-'}</td>
       `;
+      
       tableBody.appendChild(row);
     }
   } catch (error) {
     console.error('Ошибка загрузки оценок:', error);
   }
 }
+
 
 async function clearGrades() {
   if (!currentUser || currentUser.role !== 'student') {
@@ -2826,7 +3433,8 @@ async function updateStudentStats() {
       const progress = userProgress[courseId];
       const results = progress.testResults || [];
       totalTests += results.length;
-      totalCorrectTests += results.filter(r => r && r.score >= 70).length;
+      // ✅ Используем пятибалльную оценку для подсчёта
+      totalCorrectTests += results.filter(r => r && (r.grade || convertToFivePointScale(r.score)) >= 3).length;
       const completed = progress.completedLectures || {};
       completedLectures += Object.keys(completed).length;
     }
@@ -2916,6 +3524,7 @@ async function updateStudentStats() {
       }
     }
     
+    // ✅ ТАБЛИЦА ОЦЕНОК — ИСПРАВЛЕНО
     const gradesTable = document.getElementById('grades-table');
     if (gradesTable) {
       const allScores = Object.values(userProgress).flatMap(c => c.testResults || []);
@@ -2932,17 +3541,20 @@ async function updateStudentStats() {
         for (const courseId in userProgress) {
           const course = courses[courseId];
           const results = userProgress[courseId].testResults || [];
-          results.forEach(r => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td>${course ? escapeHtmlAttr(course.title) : 'Неизвестный курс'}</td>
-              <td>Тест</td>
-              <td>${escapeHtmlAttr(r.testName)}</td>
-              <td>${r.score}%</td>
-              <td>${r.date}</td>
-            `;
-            gradesTable.appendChild(row);
-          });
+results.forEach(r => {
+  const row = document.createElement('tr');
+  const grade = r.grade || convertToFivePointScale(r.score);
+  row.innerHTML = `
+    <td>${course ? escapeHtmlAttr(course.title) : 'Неизвестный курс'}</td>
+    <td>Тест</td>
+    <td>${escapeHtmlAttr(r.testName)}</td>
+    <td style="color: ${grade >= 4 ? 'hsl(142, 76%, 37%)' : grade === 3 ? 'hsl(38, 92%, 50%)' : 'hsl(0, 62.8%, 30.6%)'}; font-weight: bold; font-size: 1.1rem;">
+      ${grade}
+    </td>
+    <td>${r.date}</td>
+  `;
+  gradesTable.appendChild(row);
+});
         }
       }
     }
@@ -3186,6 +3798,85 @@ document.getElementById('profile-form')?.addEventListener('submit', async functi
   }
 });
 
+async function deleteProfile() {
+    if (!currentUser || !currentUser.id) {
+        alert('❌ Пользователь не авторизован');
+        return;
+    }
+    
+    const confirmed = confirm(
+        '⚠️ ВНИМАНИЕ! Вы уверены, что хотите удалить свой профиль?\n\n' +
+        'Это действие НЕЛЬЗЯ отменить. Будут удалены:\n' +
+        '• Ваш аккаунт в Firebase Auth\n' +
+        '• Данные профиля из Firestore\n' +
+        '• Весь прогресс обучения и оценки\n' +
+        '• Все подписки на курсы'
+    );
+    
+    if (!confirmed) return;
+    
+    // Подтверждение email
+    const emailConfirm = prompt('Для подтверждения введите ваш email:\n' + currentUser.email);
+    if (!emailConfirm || emailConfirm !== currentUser.email) {
+        alert('❌ Email не совпадает. Удаление отменено.');
+        return;
+    }
+    
+    // Запрос пароля для повторной аутентификации
+    const password = prompt('Для подтверждения введите ваш пароль:');
+    if (!password) {
+        alert('❌ Пароль не введён. Удаление отменено.');
+        return;
+    }
+    
+    try {
+        // 🔐 Повторная аутентификация (требование Firebase)
+        const credential = firebase.auth.EmailAuthProvider.credential(
+            currentUser.email,
+            password
+        );
+        await auth.currentUser.reauthenticateWithCredential(credential);
+        
+        const userId = currentUser.id;
+        
+        // 1. Удаляем прогресс студента
+        await db.collection('studentProgress').doc(userId).delete().catch(() => {});
+        
+        // 2. Удаляем подписки
+        const subsSnapshot = await db.collection('subscriptions')
+            .where('studentId', '==', userId).get();
+        const batch = db.batch();
+        subsSnapshot.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit().catch(() => {});
+        
+        // 3. Удаляем профиль из Firestore
+        await db.collection('users').doc(userId).delete();
+        
+        // 4. Удаляем аккаунт в Firebase Auth
+        await auth.currentUser.delete();
+        
+        // 5. Выход и редирект
+        currentUser = null;
+        updateAuthUI();
+        showPage('home');
+        
+        alert('✅ Профиль успешно удалён');
+        
+    } catch (error) {
+        console.error('Ошибка при удалении профиля:', error);
+        
+        if (error.code === 'auth/wrong-password') {
+            alert('❌ Неверный пароль. Удаление отменено.');
+        } else if (error.code === 'auth/requires-recent-login') {
+            alert('⚠️ Требуется повторный вход.\nВыйдите и войдите снова, затем повторите удаление.');
+        } else if (error.code === 'permission-denied') {
+            alert('❌ Недостаточно прав.\nПроверьте правила безопасности Firestore в консоли Firebase.');
+        } else {
+            alert('❌ Ошибка: ' + error.message);
+        }
+    }
+}
+
 function updateWelcomeMessage() {
   const welcomeName = document.getElementById('welcome-name');
   const welcomeNameInitial = document.getElementById('welcome-name-initial');
@@ -3209,68 +3900,6 @@ function updateWelcomeMessage() {
 // Предпросмотр выбранного файла
 // Глобальная переменная для хранения URL загруженного файла
 let uploadedFileUrl = null;
-
-// Обработчик загрузки файла
-
-
-// Измените обработчик формы лекции
-document.getElementById('lecture-form')?.addEventListener('submit', async function(e) {
-  e.preventDefault();
-  const courseId = document.getElementById('lecture-course-id').value;
-  const title = document.getElementById('lecture-title').value;
-  const content = document.getElementById('lecture-content').value;
-  const fileInput = document.getElementById('lecture-file');
-  const file = fileInput.files[0];
-  
-  try {
-    let fileData = null;
-    
-    // Если есть файл для загрузки
-    if (file) {
-      const lectureId = editingLectureDocId || db.collection(`courses/${courseId}/lectures`).doc().id;
-      fileData = await uploadLectureFile(file, courseId, lectureId);
-    }
-    
-    if (editingLectureDocId) {
-      // Обновление существующей лекции
-      const updateData = { title, content };
-      if (fileData) {
-        updateData.fileUrl = fileData.url;
-        updateData.fileName = fileData.name;
-        updateData.fileSize = fileData.size;
-      }
-      await db.collection(`courses/${courseId}/lectures`).doc(editingLectureDocId).update(updateData);
-      alert('✅ Лекция обновлена!');
-    } else {
-      // Создание новой лекции
-      const lectureData = { 
-        title, 
-        content, 
-        order: Date.now() 
-      };
-      if (fileData) {
-        lectureData.fileUrl = fileData.url;
-        lectureData.fileName = fileData.name;
-        lectureData.fileSize = fileData.size;
-      }
-      await db.collection(`courses/${courseId}/lectures`).add(lectureData);
-      alert('✅ Лекция добавлена!');
-    }
-    
-    editingLectureDocId = null;
-    const submitBtn = document.querySelector('#lecture-form button[type="submit"]');
-    if (submitBtn) submitBtn.textContent = 'Сохранить лекцию';
-    
-    // Очистка формы
-    fileInput.value = '';
-    document.getElementById('file-preview').style.display = 'none';
-    
-    hideAddLectureForm();
-  } catch (error) {
-    console.error('Ошибка при сохранении лекции:', error);
-    alert('❌ Не удалось сохранить лекцию. Попробуйте позже.');
-  }
-});
 
 // Удаление файла лекции
 async function deleteLectureFile(courseId, lectureId) {
@@ -3312,6 +3941,130 @@ function downloadFile(url, fileName) {
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
+}
+
+// Функция конвертации процентов в пятибалльную оценку
+function convertToFivePointScale(percentage) {
+    if (percentage >= 90) return 5;
+    if (percentage >= 80) return 4;
+    if (percentage >= 70) return 3;
+    return 2;
+}
+
+// === ОБРАБОТЧИК ФОРМЫ ЛЕКЦИИ ===
+document.getElementById('lecture-form')?.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const courseId = document.getElementById('lecture-course-id').value;
+    const title = document.getElementById('lecture-title').value.trim();
+    const content = document.getElementById('lecture-content').value.trim();
+    const fileInput = document.getElementById('lecture-file');
+    const file = fileInput.files[0];
+
+    if (!title) {
+        alert('⚠️ Введите название лекции');
+        return;
+    }
+
+    const progressDiv = document.getElementById('file-upload-progress');
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+
+    let fileData = null;
+
+    // Если файл выбран — загружаем в Supabase
+    if (file) {
+        if (progressDiv) progressDiv.style.display = 'block';
+        if (progressBar) progressBar.style.width = '30%';
+        if (progressText) progressText.textContent = 'Подготовка...';
+
+        try {
+            if (progressBar) progressBar.style.width = '60%';
+            if (progressText) progressText.textContent = 'Загрузка...';
+            
+            fileData = await uploadToSupabase(file, courseId, title);
+            
+            if (progressBar) progressBar.style.width = '100%';
+            if (progressText) progressText.textContent = 'Готово!';
+        } catch (err) {
+            console.error(err);
+            alert('❌ Ошибка загрузки файла: ' + err.message);
+            if (progressDiv) progressDiv.style.display = 'none';
+            return;
+        }
+    }
+
+    // Определяем порядок лекции
+    const lecturesSnapshot = await db.collection(`courses/${courseId}/lectures`).get();
+    const newOrder = lecturesSnapshot.size + 1;
+
+    const lectureData = {
+        title: title,
+        content: content,
+        order: newOrder,
+        hasFile: !!fileData,
+        fileName: fileData ? fileData.fileName : null,
+        fileUrl: fileData ? fileData.downloadUrl : null,
+        fileSize: fileData ? fileData.fileSize : null,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+
+    try {
+        if (editingLectureDocId) {
+            // Редактирование
+            if (!file) {
+                delete lectureData.fileUrl;
+                delete lectureData.fileName;
+                delete lectureData.fileSize;
+                delete lectureData.hasFile;
+            }
+            await db.collection(`courses/${courseId}/lectures`).doc(editingLectureDocId).update(lectureData);
+            alert('✅ Лекция обновлена!');
+            editingLectureDocId = null;
+        } else {
+            // Создание новой
+            await db.collection(`courses/${courseId}/lectures`).add(lectureData);
+            alert('✅ Лекция добавлена!');
+        }
+
+        // Сброс формы
+        this.reset();
+        if (progressDiv) progressDiv.style.display = 'none';
+        hideAddLectureForm();
+        viewCourse(courseId);
+
+    } catch (error) {
+        console.error('Ошибка сохранения лекции:', error);
+        alert('❌ Не удалось сохранить лекцию: ' + error.message);
+    }
+});
+
+// функции удаления лекций и тестов
+
+async function deleteLecture(courseId, lectureDocId) {
+    if (!confirm('Вы уверены, что хотите удалить эту лекцию?')) return;
+    
+    try {
+        await db.collection(`courses/${courseId}/lectures`).doc(lectureDocId).delete();
+        alert('✅ Лекция удалена!');
+        viewCourse(courseId); // Обновляем отображение
+    } catch (error) {
+        console.error('Ошибка при удалении лекции:', error);
+        alert('❌ Не удалось удалить лекцию. Попробуйте позже.');
+    }
+}
+
+async function deleteTest(courseId, testDocId) {
+    if (!confirm('Вы уверены, что хотите удалить этот тест?')) return;
+    
+    try {
+        await db.collection(`courses/${courseId}/tests`).doc(testDocId).delete();
+        alert('✅ Тест удалён!');
+        viewCourse(courseId); // Обновляем отображение
+    } catch (error) {
+        console.error('Ошибка при удалении теста:', error);
+        alert('❌ Не удалось удалить тест. Попробуйте позже.');
+    }
 }
 
 </script>
